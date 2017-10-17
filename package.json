@@ -3,17 +3,46 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tborychowski/filer.git"
+  },
   "scripts": {
     "start": "electron index.js",
-    "pack": "electron-packager . --icon './assets/icon.icns' --overwrite --platform=darwin"
+    "build": "gulp build && build --mac",
+    "release": "build --mac --publish always"
   },
-  "author": "",
+  "author": "Tom",
   "license": "ISC",
+  "build": {
+    "appId": "com.electron.filer",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "publish": [
+      "github"
+    ]
+  },
   "dependencies": {
-    "electron": "^1.7.9",
+    "electron-config": "^1.0.0",
+    "electron-window-state": "^4.1.1",
     "file-icon": "^2.0.1",
     "file-icons-js": "websemantics/file-icons-js",
     "fs-extra": "^4.0.2",
-    "javascript-natural-sort": "^0.7.1"
+    "ionicons": "^3.0.0",
+    "javascript-natural-sort": "^0.7.1",
+    "lodash.get": "^4.4.2"
+  },
+  "devDependencies": {
+    "electron": "^1.7.9",
+    "electron-builder": "19.31.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-debug": "^3.1.0",
+    "gulp-notify": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-run-electron": "^3.0.1",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-stylus": "^2.6.0"
   }
 }

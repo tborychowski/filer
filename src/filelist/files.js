@@ -2,8 +2,6 @@ const FS = require('fs-extra');
 const PATH = require('path');
 const OS = require('os');
 const naturalSort = require('javascript-natural-sort');
-const fileIcon = require('file-icon');
-const fileIcons = require('file-icons-js');
 
 
 const homedir = OS.homedir();
@@ -11,23 +9,6 @@ const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;
 let SHOW_HIDDEN = true;
-
-
-
-
-function bufToDataURI (buf) {
-	const string = buf.toString('base64');
-	const limit = parseInt(string.length / 50, 10);
-	const lines = [];
-	lines.push('data:image/png;base64,');
-	for (let i = 1; i <= limit; i++) {
-		lines.push(string.substring((i - 1) * 50, i * 50));
-	}
-	if (string.length > limit * 50) {
-		lines.push(string.substring(limit * 50, string.length));
-	}
-	return lines.join('\n');
-}
 
 
 function sortFiles (dirPath, fileList) {
@@ -72,32 +53,6 @@ function readDir (path = homedir) {
 }
 
 
-// Add caching
-function getFileHtml (file) {
-	return fileIcon.buffer(file.path, {size: 22})
-		.then(bufToDataURI)
-		.then(img => `<li class="file-item">
-			<img class="file-icon" src="${img}">
-			<span class="file-name">${file.name}</span>
-		</li>`);
-}
-
-// leave as a backup
-function getFileHtml2 (file) {
-	const cls = fileIcons.getClass(file.name);
-	return Promise.resolve(
-		`<li class="file-item">
-			<i class="file-icon ${cls}"></i>
-			<span class="file-name">${file.name}</span>
-		</li>`);
-}
-
-function printFiles (files) {
-	const filesHtml = files.map(getFileHtml);
-	return Promise.all(filesHtml)
-		.then(html => {
-			document.querySelector('.list').innerHTML = html.join('');
-		});
-}
-
-readDir().then(printFiles);
+module.exports = {
+	readDir
+};
