@@ -5,16 +5,18 @@ const Icons = require('./icons');
 const appEl = $('#app');
 
 
-async function getFileHtml (file) {
-	const img = Icons.get(file.path)
-	return `<li class="file-item">
-			<img class="file-icon" src="${img}">
-			<span class="file-name">${file.name}</span>
-		</li>`;
+function getFileHtml (file) {
+	return Icons.get(file)
+		.then(img => {
+			return `<li class="file-item">
+					<img class="file-icon" src="${img}">
+					<span class="file-name">${file.name}</span>
+				</li>`;
+		});
 }
 
 
-function printFiles (files) {
+function getHtml (files) {
 	const filesHtml = files.map(getFileHtml);
 	return Promise.all(filesHtml).then(html => html.join(''));
 }
@@ -24,9 +26,9 @@ function printFiles (files) {
 function init () {
 	Files
 		.readDir()
-		.then(printFiles)
+		.then(getHtml)
 		.then(html => {
-			appEl.innerHTML = `<ul class="list">${html}</ul>`;
+			appEl.html(`<ul class="list">${html}</ul>`);
 		});
 }
 

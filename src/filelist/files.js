@@ -8,7 +8,7 @@ const homedir = OS.homedir();
 const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;
-let SHOW_HIDDEN = true;
+let SHOW_HIDDEN = false;
 
 
 function sortFiles (dirPath, fileList) {
