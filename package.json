@@ -1,0 +1,19 @@
+{
+  "name": "filer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron index.js",
+    "pack": "electron-packager . --icon './assets/icon.icns' --overwrite --platform=darwin"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.9",
+    "file-icon": "^2.0.1",
+    "file-icons-js": "websemantics/file-icons-js",
+    "fs-extra": "^4.0.2",
+    "javascript-natural-sort": "^0.7.1"
+  }
+}

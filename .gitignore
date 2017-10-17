@@ -1,0 +1,10 @@
+node_modules/
+dist/
+app/
+_stuff/
+
+app-update.yml
+
+.DS_Store
+*.sublime-*
+*.log
