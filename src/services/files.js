@@ -1,10 +1,8 @@
 const FS = require('fs-extra');
 const PATH = require('path');
-const OS = require('os');
 const naturalSort = require('javascript-natural-sort');
 
 
-const homedir = OS.homedir();
 const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;
@@ -45,7 +43,8 @@ function getFilesDetails (dirPath, fileList) {
 }
 
 
-function readDir (path = homedir) {
+function readDir (path) {
+	if (!path) return Promise.resolve([]);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files))
 		.then(files => getFilesDetails(path, files))

@@ -7,9 +7,12 @@ const isDev = require('./isDev');
 const _get = require('lodash.get');
 const PATH = require('path');
 const pkg = require(PATH.resolve(__dirname, '..', '..', 'package.json'));
+const OS = require('os');
 
 const appName = pkg.productName || '';
 const appRepoUrl = pkg.repository.url;
+const homeDir = OS.homedir();
+const pathSep = PATH.sep;
 
 
 const applicationsPath = () => ({
@@ -109,5 +112,7 @@ module.exports = {
 	setDockProgress,
 	openChangelog,
 	applicationsPath,
+	homeDir,
+	pathSep,
 	init
 };

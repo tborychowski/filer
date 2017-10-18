@@ -1,8 +1,8 @@
-// const { $ } = require('../core');
-const Drops = require('./drops');
-const Files = require('./files');
-const Icons = require('./icons');
-let drops;
+const { app } = require('../core');
+const { Files, Icons } = require('../services');
+const Drops = require('../drops');
+let drops, currentDir = app.homeDir;
+const sep = app.pathSep;
 
 function itemRenderer (item) {
 	const name = item.highlighted ? item.highlighted.name : item.name;
@@ -18,17 +18,27 @@ function getItemIcon (item) {
 }
 
 function dataSrc () {
-	return Files.readDir()
+	return Files.readDir(currentDir)
 		.then(items => Promise.all(items.map(getItemIcon)));
 }
 
 
-function goUp (item) {
-	console.log('up', item);
+function gotoDir (dir = app.homeDir, previousDir) {
+	currentDir = dir;
+	drops.reload().then(() => {
+		if (previousDir) drops.select(previousDir);
+	});
+}
+
+
+function goUp () {
+	const ar = currentDir.split(sep);
+	const prev = ar.pop();
+	gotoDir(ar.join(sep), prev);
 }
 
 function enterFolder (item) {
-	console.log('enter', item);
+	if (item.isDir) gotoDir(item.path);
 }
 
 function quickView (item) {

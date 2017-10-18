@@ -10,8 +10,7 @@ function get (file) {
 	if (!READY) init();
 
 	const destination = `${iconsPath}/${file.name}.png`;
-
-	if (cached.indexOf(destination)) return Promise.resolve(destination);
+	if (cached.includes(destination)) return Promise.resolve(destination);
 
 	return fileIcon.file(file.path, {size: 64, destination })
 		.then(() => destination);

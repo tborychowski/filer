@@ -137,6 +137,7 @@ Drops.prototype.onKeydown = function (e) {
 	const fn = fnmap[key];
 	if (typeof fn === 'function') {
 		e.preventDefault();
+		if (!this.input.value) this.input.blur();
 		fn();
 	}
 	else this.input.focus();
@@ -323,6 +324,18 @@ Object.defineProperties(Drops.prototype, {
 			return this;
 		}
 	},
+	reload: {
+		value () {
+			this.state.selectedIndex = 0;
+			return this.load();
+		}
+	},
+	select: {
+		value (name) {
+			this.state.selectedIndex = this.filteredData.findIndex(item => item.name === name);
+			return this.highlight();
+		}
+	}
 });
 
 
