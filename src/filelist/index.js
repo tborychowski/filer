@@ -1,35 +1,33 @@
-const { $ } = require('../core');
+// const { $ } = require('../core');
+const Drops = require('../drops');
 const Files = require('./files');
 const Icons = require('./icons');
 
-const appEl = $('#app');
-
-
-function getFileHtml (file) {
-	return Icons.get(file)
-		.then(img => {
-			return `<li class="file-item">
-					<img class="file-icon" src="${img}">
-					<span class="file-name">${file.name}</span>
-				</li>`;
-		});
+function itemRenderer (item) {
+	return `<img class="file-icon" src="${item.img}">
+		<span class="file-name">${item.name}</span>`;
 }
 
-
-function getHtml (files) {
-	const filesHtml = files.map(getFileHtml);
-	return Promise.all(filesHtml).then(html => html.join(''));
+function getItemIcon (item) {
+	return Icons.get(item).then(img => {
+		item.img = img;
+		return item;
+	});
 }
 
+function dataSrc (/*val*/) {
+	return Files.readDir().then(items => Promise.all(items.map(getItemIcon)));
+
+}
 
 
 function init () {
-	Files
-		.readDir()
-		.then(getHtml)
-		.then(html => {
-			appEl.html(`<ul class="list">${html}</ul>`);
-		});
+	new Drops('.file-list', {
+		dataSrc,
+		itemRenderer,
+		valueField: 'path',
+		searchInFields: ['name', 'path'],
+	});
 }
 
 

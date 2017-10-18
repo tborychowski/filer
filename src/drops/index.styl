@@ -1,0 +1,31 @@
+@require '_lib'
+
+.drops
+	display flex
+	height 100%
+	flex-flow column
+
+	.drops-input
+		font inherit
+		width 100%
+		height 22px
+
+	.drops-list
+		width 100%
+		overflow-y auto
+		padding 10px 0
+		flex 1
+
+
+	.drops-list-item
+		padding 5px 10px
+		color #333;
+		display flex
+		align-items center
+
+
+
+	// .drops-list-item:hover
+	.drops-list-item.selected
+		background-color #2E69E2
+		color #fff

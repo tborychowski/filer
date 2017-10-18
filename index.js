@@ -22,7 +22,7 @@ function createWindow () {
 
 	win.loadURL(`file://${__dirname}/app/index.html`);
 	win.show();
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 }
 
 app.on('window-all-closed', app.quit);
