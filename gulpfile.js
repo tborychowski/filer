@@ -12,6 +12,7 @@ gulp.task('html', () => gulp
 	.pipe(gulp.dest('app/'))
 );
 
+
 gulp.task('js', () => gulp
 	.src('src/**/*.js')
 	.pipe(plumber({errorHandler: notify.onError('JS: <%= error.message %>')}))

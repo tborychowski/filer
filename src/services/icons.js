@@ -1,7 +1,9 @@
-const { app } = require('../core');
+// const {app} = require('electron').remote;
+const apphelper = require('../core').app;
 const FS = require('fs-extra');
 const fileIcon = require('file-icon');
-const iconsPath = app.getUserDataFolder() + '/icons';
+const iconsPath = apphelper.getUserDataFolder() + '/icons';
+
 
 let READY = false, cached;
 
@@ -12,8 +14,17 @@ function get (file) {
 	const destination = `${iconsPath}/${file.name}.png`;
 	if (cached.includes(destination)) return Promise.resolve(destination);
 
-	return fileIcon.file(file.path, {size: 64, destination })
-		.then(() => destination);
+	return fileIcon.file(file.path, {size: 64, destination }).then(() => destination);
+}
+
+
+
+function getClass (file) {
+	let cls = '';
+	if (file.isDir) cls = 'folder';
+	if (file.isFile) cls = 'file-o';
+
+	return Promise.resolve('fa fa-' + cls);
 }
 
 
@@ -26,41 +37,6 @@ function init () {
 
 
 module.exports = {
-	get
+	get,
+	getClass,
 };
-
-
-
-
-
-
-
-
-
-
-// const fileIcons = require('file-icons-js');
-// function bufToDataURI (buf) {
-// 	const string = buf.toString('base64');
-// 	const limit = parseInt(string.length / 50, 10);
-// 	const lines = [];
-// 	lines.push('data:image/png;base64,');
-// 	for (let i = 1; i <= limit; i++) {
-// 		lines.push(string.substring((i - 1) * 50, i * 50));
-// 	}
-// 	if (string.length > limit * 50) {
-// 		lines.push(string.substring(limit * 50, string.length));
-// 	}
-// 	return lines.join('\n');
-// }
-
-// leave as a backup
-// function getFileHtml2 (file) {
-// 	const cls = fileIcons.getClass(file.name);
-// 	return Promise.resolve(
-// 		`<li class="file-item">
-// 			<i class="file-icon ${cls}"></i>
-// 			<span class="file-name">${file.name}</span>
-// 		</li>`);
-// }
-
-

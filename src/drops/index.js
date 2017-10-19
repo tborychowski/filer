@@ -10,10 +10,9 @@ function Drops (target, config = { valueField: 'name' }) {
 	this.filteredData = [];
 	this.dataSrc = config.dataSrc || (() => Promise.resolve([]));
 	this.eventListeners = {
-		select: [],
-		left: [],
-		right: [],
-		space: [],
+		keydown: [],
+		dblclick: [],
+		click: [],
 	};
 	this.state = {
 		focused: false,
@@ -110,47 +109,42 @@ Drops.prototype.initEvents = function () {
 	this.input.addEventListener('focus', this.onFocus.bind(this));
 	this.input.addEventListener('blur', this.onBlur.bind(this));
 	this.input.addEventListener('input', this.onInput.bind(this));
-
-	document.addEventListener('keydown', this.onKeydown.bind(this));
-	document.addEventListener('keypress', this.onKeypress.bind(this));
-
 	this.target.addEventListener('click', this.onClick.bind(this));
-	this.target.addEventListener('dblclick', this.onDoubleClick.bind(this));
+	this.target.addEventListener('dblclick', e => this.triggerEvent(e));
+	document.addEventListener('keydown', this.onKeydown.bind(this));
 };
 
 
 Drops.prototype.onKeydown = function (e) {
+	const metaKeys = ['Meta', 'Alt', 'Control'];
 	let key = e.key;
 	if (key === 'Tab' && e.shiftKey) key = 'ShiftTab';
 	else if (key === ' ' && !this.state.focused) key = 'Space';
+	else if (key === 'Backspace' && !this.state.focused) key = 'Backspace1';
 
 	const fnmap = {
-		Escape: this.onEsc.bind(this),
-		Tab: this.down.bind(this),
-		ShiftTab: this.up.bind(this),
-		ArrowDown: this.down.bind(this),
-		ArrowUp: this.up.bind(this),
-		ArrowLeft: this.goLeft.bind(this),
-		ArrowRight: this.goRight.bind(this),
-		Space: this.onSpace.bind(this),
+		Escape     : () => this.onEsc(),
+		Tab        : () => this.down(),
+		ShiftTab   : () => this.up(),
+		ArrowDown  : () => this.down(),
+		ArrowUp    : () => this.up(),
+		ArrowLeft  : () => this.triggerEvent(e),
+		ArrowRight : () => this.triggerEvent(e),
+		Backspace1 : () => this.triggerEvent(e),
+		Space      : () => this.triggerEvent(e),
+		Enter      : () => this.triggerEvent(e),
+
 	};
+
 	const fn = fnmap[key];
 	if (typeof fn === 'function') {
 		e.preventDefault();
 		if (!this.input.value) this.input.blur();
-		fn();
+		return fn();
 	}
-	else this.input.focus();
+	if (metaKeys.includes(key)) return;
+	this.input.focus();
 };
-
-
-Drops.prototype.onKeypress = function (e) {
-	if (e.key === 'Enter') {
-		e.preventDefault();
-		this.selectItem.call(this);
-	}
-};
-
 
 
 Drops.prototype.onClick = function (e) {
@@ -159,11 +153,6 @@ Drops.prototype.onClick = function (e) {
 	this.state.selectedIndex = Array.from(target.parentNode.children).indexOf(target);
 	return this.highlight();
 };
-
-Drops.prototype.onDoubleClick = function () {
-	this.selectItem.call(this);
-};
-
 
 
 Drops.prototype.onFocus = function () {
@@ -191,8 +180,15 @@ Drops.prototype.onEsc = function () {
 
 
 
-Drops.prototype.triggerEvent = function (eventName, params) {
-	this.eventListeners[eventName].forEach(cb => { cb.apply(cb, params); });
+Drops.prototype.triggerEvent = function (event, params) {
+	if (!params) {
+		this.state.selectedItem = this.filteredData[this.state.selectedIndex];
+		params = [this.state.selectedItem];
+	}
+	params = [event].concat(params);
+	if (this.eventListeners[event.type]) {
+		this.eventListeners[event.type].forEach(cb => { cb.apply(cb, params); });
+	}
 	return this;
 };
 
@@ -271,23 +267,6 @@ Drops.prototype.down = function () {
 };
 
 
-Drops.prototype.goLeft = function () {
-	this.state.selectedItem = this.filteredData[this.state.selectedIndex];
-	this.triggerEvent('left', [ this.state.selectedItem ]);
-};
-
-Drops.prototype.goRight = function () {
-	this.state.selectedItem = this.filteredData[this.state.selectedIndex];
-	this.triggerEvent('right', [ this.state.selectedItem ]);
-};
-
-Drops.prototype.onSpace = function () {
-	this.state.selectedItem = this.filteredData[this.state.selectedIndex];
-	this.triggerEvent('space', [ this.state.selectedItem ]);
-};
-
-
-
 Drops.prototype.highlight = function () {
 	const idx = this.state.selectedIndex;
 	this.list
@@ -304,15 +283,6 @@ Drops.prototype.highlight = function () {
 };
 
 
-Drops.prototype.selectItem = function () {
-	this.state.selectedItem = this.filteredData[this.state.selectedIndex];
-	return this
-		.highlight()
-		.triggerEvent('select', [ this.state.selectedItem ]);
-};
-
-
-
 
 // *** API *****************************************************************************************
 Object.defineProperties(Drops.prototype, {
@@ -327,6 +297,8 @@ Object.defineProperties(Drops.prototype, {
 	reload: {
 		value () {
 			this.state.selectedIndex = 0;
+			this.input.value = '';
+			this.input.blur();
 			return this.load();
 		}
 	},

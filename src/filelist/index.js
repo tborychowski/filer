@@ -4,22 +4,41 @@ const Drops = require('../drops');
 let drops, currentDir = app.homeDir;
 const sep = app.pathSep;
 
+const keyMap = {
+	ArrowLeft: goUp,
+	ArrowRight: enterFolder,
+	Space: quickView,
+	Backspace,
+	Enter,
+};
+
+
+
 function itemRenderer (item) {
 	const name = item.highlighted ? item.highlighted.name : item.name;
-	return `<img class="file-icon" src="${item.img}">
+	// return `<img class="file-icon" src="${item.img}">
+	return `<i class="file-icon ${item.cls}"></i>
 		<span class="file-name">${name}</span>`;
 }
 
-function getItemIcon (item) {
-	return Icons.get(item).then(img => {
-		item.img = img;
+// function getItemIcon (item) {
+// 	return Icons.get(item).then(img => {
+// 		item.img = img;
+// 		return item;
+// 	});
+// }
+
+
+function getItemIconCls (item) {
+	return Icons.getClass(item).then(cls => {
+		item.cls = cls;
 		return item;
 	});
 }
 
 function dataSrc () {
 	return Files.readDir(currentDir)
-		.then(items => Promise.all(items.map(getItemIcon)));
+		.then(items => Promise.all(items.map(getItemIconCls)));
 }
 
 
@@ -31,18 +50,30 @@ function gotoDir (dir = app.homeDir, previousDir) {
 }
 
 
+
+
 function goUp () {
 	const ar = currentDir.split(sep);
 	const prev = ar.pop();
 	gotoDir(ar.join(sep), prev);
 }
 
-function enterFolder (item) {
+function enterFolder (e, item) {
 	if (item.isDir) gotoDir(item.path);
 }
 
-function quickView (item) {
+function quickView (e, item) {
 	console.log('quickView', item);
+}
+
+function Enter (e, item) {
+	if (e.metaKey) console.log('rename', item);
+	else enterFolder(e, item);
+}
+
+function Backspace (e, item) {
+	if (e.metaKey) console.log('delete', item);
+	else goUp();
 }
 
 
@@ -54,12 +85,13 @@ function init () {
 		searchInFields: ['name', 'path'],
 	});
 
-	drops.on('left', goUp);
-	drops.on('right', enterFolder);
-	drops.on('space', quickView);
+	drops.on('dblclick', enterFolder);
 
-	drops.on('select', item => {
-		console.log('rename', item);
+
+	drops.on('keydown', (e, item) => {
+		let key = e.key;
+		if (key === ' ') key = 'Space';
+		if (typeof keyMap[key] === 'function') keyMap[key](e, item);
 	});
 }
 

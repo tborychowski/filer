@@ -7,19 +7,12 @@ const isDev = require('./isDev');
 const _get = require('lodash.get');
 const PATH = require('path');
 const pkg = require(PATH.resolve(__dirname, '..', '..', 'package.json'));
-const OS = require('os');
 
-const appName = pkg.productName || '';
+const appName = pkg.productName || app.getName();
 const appRepoUrl = pkg.repository.url;
-const homeDir = OS.homedir();
+const homeDir = app.getPath('home');
 const pathSep = PATH.sep;
 
-
-const applicationsPath = () => ({
-	darwin: '/Applications/',
-	win32: 'C:\\Program Files\\',
-	linux: '/usr/bin/'
-}[process.platform]);
 
 const getOpenBrowserCmd = (browser, url) => ({
 	darwin: `open -a "${browser}" "${url}"`,
@@ -111,7 +104,6 @@ module.exports = {
 	setBadge,
 	setDockProgress,
 	openChangelog,
-	applicationsPath,
 	homeDir,
 	pathSep,
 	init
