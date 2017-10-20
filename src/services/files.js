@@ -1,6 +1,9 @@
 const FS = require('fs-extra');
 const PATH = require('path');
 const naturalSort = require('javascript-natural-sort');
+const { app } = require('../core');
+const sep = app.pathSep;
+
 
 const dotRegEx = /^\./;
 
@@ -8,6 +11,7 @@ let CASE_SENSITIVE = false;
 let SHOW_HIDDEN = false;
 
 
+// TODO: add more mappings
 function getIconCls (file) {
 	let cls = '';
 	if (file.isDir) cls = 'folder';
@@ -52,11 +56,26 @@ function getFilesDetails (dirPath, fileList) {
 }
 
 
+// adds ".."
+function addFolderUp (dirPath, fileList) {
+	if (dirPath !== sep) {
+		fileList.unshift({
+			name: '..',
+			path: dirPath.split(sep).slice(0, -1).join(sep),
+			isHidden: false,
+			isDir: true,
+			unselectable: true
+		});
+	}
+	return fileList;
+}
+
 function readDir (path) {
 	if (!path) path = '/';
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files))
 		.then(files => getFilesDetails(path, files))
+		.then(files => addFolderUp(path, files))
 		.catch(console.error.bind(console));
 }
 

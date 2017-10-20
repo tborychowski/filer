@@ -39,6 +39,8 @@ const getPackage = (key) => {
 const getUserDataFolder = () => app.getPath('userData');
 const copyToClipboard = (txt) => clipboard.writeText(txt);
 const openFolder = (path) => shell.openExternal(`file://${path}`);
+const openFile = (path) => shell.openItem(path);
+
 const openSettingsFolder = () => openFolder(getUserDataFolder());
 const openChangelog = ver => {
 	const repo = getPackage('repository.url').replace(/.git$/, '');
@@ -99,6 +101,7 @@ module.exports = {
 	openInBrowser,
 	copyToClipboard,
 	openFolder,
+	openFile,
 	openSettingsFolder,
 	getUserDataFolder,
 	setBadge,

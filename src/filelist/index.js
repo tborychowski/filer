@@ -4,14 +4,6 @@ const Drops = require('../drops');
 const sep = app.pathSep;
 let drops, currentDir, currentPathEl;
 
-const keyMap = {
-	ArrowLeft: goUp,
-	ArrowRight: enterFolder,
-	Backspace,
-	Enter,
-};
-
-
 
 function itemRenderer (item) {
 	const name = item.highlighted ? item.highlighted.name : item.name;
@@ -27,16 +19,21 @@ function dataSrc () {
 
 function gotoDir (dir = app.homeDir, previousDir) {
 	if (dir === currentDir) return;
+
+
+	// console.log(dir, currentDir)
+	// if ".." - then highlight the previous folder also!
+
 	currentDir = dir;
 	currentPathEl.html(dir);
 	drops.reload().then(() => {
-		if (previousDir) drops.select(previousDir);
+		if (previousDir) drops.highlight(previousDir);
 	});
 }
 
 
 function openFile (path) {
-
+	app.openFile(path);
 }
 
 function goUp () {
@@ -74,9 +71,10 @@ function init () {
 
 
 	drops.on('keydown', (e, item) => {
-		let key = e.key;
-		if (key === ' ') key = 'Space';
-		if (typeof keyMap[key] === 'function') keyMap[key](e, item);
+		const key = e.key.toLowerCase();
+		if (key === 'backspace') return Backspace(e, item);
+		if (key === 'enter') return Enter(e, item);
+		console.log('filelist:', e);
 	});
 
 	gotoDir();
