@@ -2,11 +2,18 @@ const FS = require('fs-extra');
 const PATH = require('path');
 const naturalSort = require('javascript-natural-sort');
 
-
 const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;
 let SHOW_HIDDEN = false;
+
+
+function getIconCls (file) {
+	let cls = '';
+	if (file.isDir) cls = 'folder';
+	if (file.isFile) cls = 'file-o';
+	return 'fa fa-' + cls;
+}
 
 
 function sortFiles (dirPath, fileList) {
@@ -23,15 +30,17 @@ function sortFiles (dirPath, fileList) {
 function getFileDetails (dirPath, file) {
 	const path = PATH.join(dirPath, file);
 	const stats = FS.lstatSync(path);
-	return {
+	const item = {
 		name: file,
 		path,
 		stats,
 		ext: PATH.extname(file),
 		isDir: stats.isDirectory(),
 		isFile: stats.isFile(),
-		isHidden: dotRegEx.test(file)
+		isHidden: dotRegEx.test(file),
 	};
+	item.cls = getIconCls(item);
+	return item;
 }
 
 
@@ -44,7 +53,7 @@ function getFilesDetails (dirPath, fileList) {
 
 
 function readDir (path) {
-	if (!path) return Promise.resolve([]);
+	if (!path) path = '/';
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files))
 		.then(files => getFilesDetails(path, files))

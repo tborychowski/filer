@@ -1,13 +1,12 @@
-const { app } = require('../core');
-const { Files, Icons } = require('../services');
+const { $, app } = require('../core');
+const { Files } = require('../services');
 const Drops = require('../drops');
-let drops, currentDir = app.homeDir;
 const sep = app.pathSep;
+let drops, currentDir, currentPathEl;
 
 const keyMap = {
 	ArrowLeft: goUp,
 	ArrowRight: enterFolder,
-	Space: quickView,
 	Backspace,
 	Enter,
 };
@@ -16,41 +15,29 @@ const keyMap = {
 
 function itemRenderer (item) {
 	const name = item.highlighted ? item.highlighted.name : item.name;
-	// return `<img class="file-icon" src="${item.img}">
 	return `<i class="file-icon ${item.cls}"></i>
 		<span class="file-name">${name}</span>`;
 }
 
-// function getItemIcon (item) {
-// 	return Icons.get(item).then(img => {
-// 		item.img = img;
-// 		return item;
-// 	});
-// }
-
-
-function getItemIconCls (item) {
-	return Icons.getClass(item).then(cls => {
-		item.cls = cls;
-		return item;
-	});
-}
 
 function dataSrc () {
-	return Files.readDir(currentDir)
-		.then(items => Promise.all(items.map(getItemIconCls)));
+	return Files.readDir(currentDir);
 }
 
 
 function gotoDir (dir = app.homeDir, previousDir) {
+	if (dir === currentDir) return;
 	currentDir = dir;
+	currentPathEl.html(dir);
 	drops.reload().then(() => {
 		if (previousDir) drops.select(previousDir);
 	});
 }
 
 
+function openFile (path) {
 
+}
 
 function goUp () {
 	const ar = currentDir.split(sep);
@@ -60,10 +47,7 @@ function goUp () {
 
 function enterFolder (e, item) {
 	if (item.isDir) gotoDir(item.path);
-}
-
-function quickView (e, item) {
-	console.log('quickView', item);
+	else openFile(item.path);
 }
 
 function Enter (e, item) {
@@ -78,6 +62,7 @@ function Backspace (e, item) {
 
 
 function init () {
+	currentPathEl = $('.current-path');
 	drops = new Drops('.file-list', {
 		dataSrc,
 		itemRenderer,
@@ -93,6 +78,8 @@ function init () {
 		if (key === ' ') key = 'Space';
 		if (typeof keyMap[key] === 'function') keyMap[key](e, item);
 	});
+
+	gotoDir();
 }
 
 

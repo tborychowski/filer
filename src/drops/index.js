@@ -31,7 +31,7 @@ function Drops (target, config = { valueField: 'name' }) {
 		}
 	});
 
-	this.load().then(this.filter);
+	// this.load().then(this.filter);
 	return this.render().initEvents();
 }
 
@@ -116,33 +116,32 @@ Drops.prototype.initEvents = function () {
 
 
 Drops.prototype.onKeydown = function (e) {
-	const metaKeys = ['Meta', 'Alt', 'Control'];
+	const metaKeys = ['Meta', 'Alt', 'Control', 'Shift'];
 	let key = e.key;
-	if (key === 'Tab' && e.shiftKey) key = 'ShiftTab';
-	else if (key === ' ' && !this.state.focused) key = 'Space';
+
+	if (metaKeys.includes(key)) return;
+	if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return this.triggerEvent(e);
+
+	if (key === ' ' && !this.state.focused) key = 'Space';
 	else if (key === 'Backspace' && !this.state.focused) key = 'Backspace1';
 
 	const fnmap = {
 		Escape     : () => this.onEsc(),
-		Tab        : () => this.down(),
-		ShiftTab   : () => this.up(),
 		ArrowDown  : () => this.down(),
 		ArrowUp    : () => this.up(),
+		Space      : () => this.selectItem(),
 		ArrowLeft  : () => this.triggerEvent(e),
 		ArrowRight : () => this.triggerEvent(e),
 		Backspace1 : () => this.triggerEvent(e),
-		Space      : () => this.triggerEvent(e),
 		Enter      : () => this.triggerEvent(e),
 
 	};
 
-	const fn = fnmap[key];
-	if (typeof fn === 'function') {
+	if (typeof fnmap[key] === 'function') {
 		e.preventDefault();
 		if (!this.input.value) this.input.blur();
-		return fn();
+		return fnmap[key]();
 	}
-	if (metaKeys.includes(key)) return;
 	this.input.focus();
 };
 
@@ -282,6 +281,13 @@ Drops.prototype.highlight = function () {
 	return this;
 };
 
+
+Drops.prototype.selectItem = function () {
+	// add to selectedItems array
+	// add "selected" class
+	// if selected - unselect
+	// add API to getSelectedItems
+};
 
 
 // *** API *****************************************************************************************
