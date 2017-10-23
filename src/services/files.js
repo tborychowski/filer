@@ -10,13 +10,30 @@ const dotRegEx = /^\./;
 let CASE_SENSITIVE = false;
 let SHOW_HIDDEN = false;
 
+const FILE_TYPES = {
+	code: { js: 1, css: 1, html: 1, php: 1, xml: 1, json: 1, ts: 1, sh: 1 },
+	image: { png: 1, jpg: 1, jpeg: 1, gif: 1 },
+	video: { avi: 1, mpg: 1, mpeg: 1, mp4: 1, mkv: 1, mov: 1 },
+	audio: { mp3: 1, flac: 1, wav: 1, mid: 1 },
+	archive: { zip: 1, rar: 1, '7z': 1, tar: 1, gz: 1 },
+	text: { txt: 1, srt: 1, md: 1, log: 1 },
+	pdf: { pdf: 1 },
+	word: { doc: 1, docx: 1 },
+	excel: { xls: 1, xlsx: 1 },
+	powerpoint: { ppt: 1, pptx: 1 },
+};
 
-// TODO: add more mappings
+
+function findFileIcon (ext = '') {
+	ext = ext.toLowerCase().substr(1);
+	for (let t in FILE_TYPES) if (ext in FILE_TYPES[t]) return `file-${t}-o`;
+	return 'file-o';
+}
+
+
 function getIconCls (file) {
-	let cls = '';
-	if (file.isDir) cls = 'folder';
-	if (file.isFile) cls = 'file-o';
-	return 'fa fa-' + cls;
+	const cls = file.isDir ? 'folder' : findFileIcon(file.ext);
+	return `fa fa-${cls}`;
 }
 
 

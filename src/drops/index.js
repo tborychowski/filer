@@ -63,16 +63,13 @@ Drops.prototype.getItemsHtml = function () {
 
 
 Drops.prototype.getHtml = function () {
-	return `<div class="drops">
-		<input type="text" class="drops-input" value="${this.value || ''}" tabindex="1">
-		<div class="drops-list">${this.getItemsHtml()}</div>
-	</div>`;
+	return `<div class="drops"><div class="drops-list">${this.getItemsHtml()}</div></div>`;
 };
 
 
 Drops.prototype.render = function () {
 	this.target.innerHTML = this.getHtml();
-	this.input = this.target.querySelector('.drops-input');
+	this.input = document.querySelector('.search-input');
 	this.list = this.target.querySelector('.drops-list');
 	this.state.rendered = true;
 	return this;
@@ -121,10 +118,10 @@ Drops.prototype.initEvents = function () {
 
 Drops.prototype.onKeydown = function (e) {
 	const metaKeys = ['meta', 'alt', 'control', 'shift'];
+	const hasMeta = e.metaKey || e.altKey || e.ctrlKey || e.shiftKey;
 	let key = e.key.toLowerCase();
 
 	if (metaKeys.includes(key)) return;
-	// if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return this.triggerEvent(e);
 
 	if (key === ' ' && !this.state.focused) key = 'space';
 	else if (key === 'backspace' && !this.state.focused) key = 'backspace1';
@@ -136,7 +133,7 @@ Drops.prototype.onKeydown = function (e) {
 		arrowup    : () => this.up(),
 		arrowleft  : () => this.pageUp(),
 		arrowright : () => this.pageDown(e),
-		a          : () => this.toggleSelectAll(e),
+		a          : hasMeta ? () => this.toggleSelectAll(e) : null,
 		backspace1 : () => this.triggerEvent(e),
 		enter      : () => this.triggerEvent(e),
 
@@ -299,7 +296,7 @@ Drops.prototype.selectItem = function (item) {
 	const selIdx = this.selectedItems.indexOf(item);
 
 	if (item.unselectable) return;
-	if (selIdx > -1) {		// unselect
+	if (selIdx > -1) {								// unselect
 		this.selectedItems.splice(selIdx, 1);
 		el.classList.remove('selected');
 	}

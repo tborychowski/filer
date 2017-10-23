@@ -1,8 +1,9 @@
-const { $, app } = require('../core');
+const { app } = require('../core');
 const { Files } = require('../services');
 const Drops = require('../drops');
+const Breadcrumbs = require('../breadcrumbs');
 const sep = app.pathSep;
-let drops, currentDir, currentPathEl;
+let drops, currentDir;
 
 
 function itemRenderer (item) {
@@ -19,22 +20,13 @@ function dataSrc () {
 
 function gotoDir (dir = app.homeDir, previousDir) {
 	if (dir === currentDir) return;
-
-
-	// console.log(dir, currentDir)
-	// if ".." - then highlight the previous folder also!
-
 	currentDir = dir;
-	currentPathEl.html(dir);
+	Breadcrumbs.set(dir);
 	drops.reload().then(() => {
 		if (previousDir) drops.highlight(previousDir);
 	});
 }
 
-
-function openFile (path) {
-	app.openFile(path);
-}
 
 function goUp () {
 	const ar = currentDir.split(sep);
@@ -43,8 +35,11 @@ function goUp () {
 }
 
 function enterFolder (e, item) {
-	if (item.isDir) gotoDir(item.path);
-	else openFile(item.path);
+	if (item.isDir) {
+		if (item.name === '..') goUp();
+		else gotoDir(item.path);
+	}
+	else app.openFile(item.path);
 }
 
 function Enter (e, item) {
@@ -59,7 +54,6 @@ function Backspace (e, item) {
 
 
 function init () {
-	currentPathEl = $('.current-path');
 	drops = new Drops('.file-list', {
 		dataSrc,
 		itemRenderer,

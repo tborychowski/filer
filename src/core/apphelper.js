@@ -93,6 +93,7 @@ function init (components, path = '../') {
 		const m = require(`${path}${c}`);
 		if (m && m.init) m.init();
 	});
+	window.focus();
 }
 
 module.exports = {

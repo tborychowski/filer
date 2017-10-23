@@ -1,0 +1,33 @@
+@require '_lib'
+
+header
+	display flex
+	padding 0 20px
+	background #eee
+	align-items center
+	min-height 40px
+	border-top 1px solid #f5f5f5
+	border-bottom 1px solid #ccc
+
+
+.breadcrumbs
+	flex 3
+	text-align center
+	color #333
+
+
+.search-input
+	flex 1
+	font inherit
+	border none
+	border-radius 3px
+	padding 5px 10px
+	box-shadow 0 0 0 1px rgba(#000, 0.2)
+
+	&::placeholder
+		color #ccc
+		text-align center
+
+	&:focus
+		&::placeholder
+			color #fff
