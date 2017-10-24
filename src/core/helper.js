@@ -9,6 +9,7 @@ const PATH = require('path');
 const pkg = require(PATH.resolve(__dirname, '..', '..', 'package.json'));
 
 const appName = pkg.productName || app.getName();
+const appVersion = app.getVersion();
 const appRepoUrl = pkg.repository.url;
 const homeDir = app.getPath('home');
 const pathSep = PATH.sep;
@@ -98,6 +99,7 @@ function init (components, path = '../') {
 
 module.exports = {
 	appName,
+	appVersion,
 	appRepoUrl,
 	openInBrowser,
 	copyToClipboard,

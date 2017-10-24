@@ -1,3 +1,6 @@
+const { $ } = require('../core');
+
+
 function Drops (target, config = { valueField: 'name' }) {
 	if (!(this instanceof Drops)) return new Drops(target, config);
 	if (typeof target === 'string') target = document.querySelector(target);
@@ -117,26 +120,23 @@ Drops.prototype.initEvents = function () {
 
 
 Drops.prototype.onKeydown = function (e) {
-	const metaKeys = ['meta', 'alt', 'control', 'shift'];
 	const hasMeta = e.metaKey || e.altKey || e.ctrlKey || e.shiftKey;
+	const navMode = !this.state.focused;
 	let key = e.key.toLowerCase();
 
-	if (metaKeys.includes(key)) return;
-
-	if (key === ' ' && !this.state.focused) key = 'space';
-	else if (key === 'backspace' && !this.state.focused) key = 'backspace1';
+	if (key === ' ' && navMode) key = 'space';
+	else if (key === 'backspace' && navMode && !hasMeta) key = 'backspace1';
+	else if (key === 'enter' && !hasMeta) key = 'enter1';
 
 	const fnmap = {
 		escape     : () => this.onEsc(),
 		space      : () => this.selectItem(),
 		arrowdown  : () => this.down(),
 		arrowup    : () => this.up(),
-		arrowleft  : () => this.pageUp(),
-		arrowright : () => this.pageDown(e),
-		a          : hasMeta ? () => this.toggleSelectAll(e) : null,
+		arrowleft  : navMode ? () => this.pageUp() : null,
+		arrowright : navMode ? () => this.pageDown(e) : null,
 		backspace1 : () => this.triggerEvent(e),
-		enter      : () => this.triggerEvent(e),
-
+		enter1     : () => this.triggerEvent(e),
 	};
 
 	if (typeof fnmap[key] === 'function') {
@@ -144,7 +144,8 @@ Drops.prototype.onKeydown = function (e) {
 		if (!this.input.value) this.input.blur();
 		return fnmap[key]();
 	}
-	this.input.focus();
+
+	if ($.isAlpha(e) && navMode) return this.input.focus();
 };
 
 
@@ -284,13 +285,19 @@ Drops.prototype.pageDown = function () {
 
 
 
+Drops.prototype.getSelectedItems = function () {
+	return this.selectedItems;
+};
+
 Drops.prototype.getElFromIdx = function (idx) {
 	if (idx > -1) return this.list.querySelector(`.drops-list-item:nth-child(${idx + 1})`);
 };
 
 
-Drops.prototype.selectItem = function (item) {
-	item = item || this.filteredData[this.state.selectedIndex];
+Drops.prototype.selectItem = function () {
+	if (this.state.focused) return;
+
+	const item = this.filteredData[this.state.selectedIndex];
 	this.state.selectedItem = item;
 	const el = this.getElFromIdx(this.state.selectedIndex);
 	const selIdx = this.selectedItems.indexOf(item);
@@ -363,12 +370,6 @@ Drops.prototype.highlight = function (name) {
 	}
 	return this;
 };
-
-
-
-
-// TODO: add API to getSelectedItems
-
 
 
 

@@ -1,13 +1,13 @@
 const config = require('./config');
 const EVENT = require('./events');
-const app = require('./apphelper');
+const helper = require('./helper');
 const dialog = require('./dialog');
 const isDev = require('./isDev');
 const $ = require('./util');
 
 module.exports = {
 	$,
-	app,
+	helper,
 	config,
 	EVENT,
 	dialog,

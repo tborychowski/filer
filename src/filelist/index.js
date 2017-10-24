@@ -1,8 +1,8 @@
-const { app } = require('../core');
-const { Files } = require('../services');
+const { $, EVENT, helper } = require('../core');
+const { Files, Config } = require('../services');
 const Drops = require('../drops');
 const Breadcrumbs = require('../breadcrumbs');
-const sep = app.pathSep;
+const sep = helper.pathSep;
 let drops, currentDir;
 
 
@@ -13,19 +13,16 @@ function itemRenderer (item) {
 }
 
 
-function dataSrc () {
-	return Files.readDir(currentDir);
-}
-
-
-function gotoDir (dir = app.homeDir, previousDir) {
+function gotoDir (dir = helper.homeDir, previousDir) {
 	if (dir === currentDir) return;
 	currentDir = dir;
+	Config.set('currentDir', dir);
 	Breadcrumbs.set(dir);
 	drops.reload().then(() => {
 		if (previousDir) drops.highlight(previousDir);
 	});
 }
+
 
 
 function goUp () {
@@ -39,23 +36,32 @@ function enterFolder (e, item) {
 		if (item.name === '..') goUp();
 		else gotoDir(item.path);
 	}
-	else app.openFile(item.path);
+	else helper.openFile(item.path);
 }
 
-function Enter (e, item) {
-	if (e.metaKey) console.log('rename', item);
-	else enterFolder(e, item);
+function rename (e, item) {
+	console.log('rename', item);
 }
 
-function Backspace (e, item) {
-	if (e.metaKey) console.log('delete', item);
-	else goUp();
+function del (e, item) {
+	console.log('delete', item);
 }
 
+function cut () {
+	console.log('cut', drops.getSelectedItems());
+}
+
+function copy () {
+	console.log('copy', drops.getSelectedItems());
+}
+
+function paste () {
+	console.log('paste', currentDir);
+}
 
 function init () {
 	drops = new Drops('.file-list', {
-		dataSrc,
+		dataSrc: () => Files.readDir(currentDir),
 		itemRenderer,
 		valueField: 'path',
 		searchInFields: ['name', 'path'],
@@ -65,11 +71,20 @@ function init () {
 
 
 	drops.on('keydown', (e, item) => {
-		const key = e.key.toLowerCase();
-		if (key === 'backspace') return Backspace(e, item);
-		if (key === 'enter') return Enter(e, item);
+		if (e.key === 'Backspace') return goUp();
+		if (e.key === 'Enter') return enterFolder(e, item);
 		console.log('filelist:', e);
 	});
+
+	$.on(EVENT.filelist.cut, cut);
+	$.on(EVENT.filelist.copy, copy);
+	$.on(EVENT.filelist.paste, paste);
+	$.on(EVENT.filelist.delete, del);
+	$.on(EVENT.filelist.rename, rename);
+	$.on(EVENT.filelist.select, () => drops.selectItem());
+	$.on(EVENT.filelist.selectall, () => drops.selectAll());
+	$.on(EVENT.filelist.unselectall, () => drops.unselectAll());
+	$.on(EVENT.search.start, () => drops.onFocus());
 
 	gotoDir();
 }

@@ -1,8 +1,8 @@
 const FS = require('fs-extra');
 const PATH = require('path');
 const naturalSort = require('javascript-natural-sort');
-const { app } = require('../core');
-const sep = app.pathSep;
+const { helper } = require('../core');
+const sep = helper.pathSep;
 
 
 const dotRegEx = /^\./;

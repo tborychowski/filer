@@ -97,13 +97,13 @@ function isCutCopyPaste (e) {
 }
 
 // a - z
-function isAlpha (e) { return (e.keyCode >= 65 && e.keyCode <= 90 && !e.ctrlKey); }
+function isAlpha (e) { return (e.keyCode >= 65 && e.keyCode <= 90 && !e.ctrlKey && !e.metaKey); }
+
+function isDigit (e) { return digits[e.keyCode] === 1 && !e.shiftKey; }
 
 function isAlphaNumeric (e) { return isAlpha(e) || isDigit(e); }
 
 function isNavChar (e) { return allowedChars[e.keyCode] === 1; }
-
-function isDigit (e) { return digits[e.keyCode] === 1 && !e.shiftKey; }
 
 function isNumberField (e) {
 	const isEnter = (e.keyCode === 13);

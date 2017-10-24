@@ -1,12 +1,12 @@
 const {app, BrowserWindow} = require('electron');
 const windowStateKeeper = require('electron-window-state');
-const appHelper = require('./app/core/apphelper');
+const helper = require('./app/core/helper');
 
 let win;
 function createWindow () {
 	const mainWindowState = windowStateKeeper({ defaultWidth: 1000, defaultHeight: 800 });
 	win = new BrowserWindow({
-		title: appHelper.appName,
+		title: helper.appName,
 		icon: __dirname + '/assets/icon.png',
 		show: false,
 		// titleBarStyle: 'hidden-inset',

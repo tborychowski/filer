@@ -1,12 +1,10 @@
-const {app} = require('./core');
+const {helper} = require('./core');
 
-app.init([
+helper.init([
 	'filelist',
+	'mainmenu',
 
 ]);
 
-
-
-// TODO: Add main menu management & shortcuts
 
 
