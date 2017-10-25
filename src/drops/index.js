@@ -79,29 +79,10 @@ Drops.prototype.render = function () {
 };
 
 
-Drops.prototype.getItemHeight = function () {
-	const item = this.list.querySelector('.drops-list-item');
-	if (!item) return 0;
-	const listDisplay = this.list.style.display;
-	this.list.style.display = 'block';
-	const itemH = item.getBoundingClientRect().height;
-	this.list.style.display = listDisplay;
-	return itemH;
-};
-
-
 Drops.prototype.updateList = function () {
 	if (!this.list) return this;
 	this.list.innerHTML = this.getItemsHtml();
-
-	const itemH = this.getItemHeight();
-	let maxH = this.config.maxHeight || 10;
-	let datlen = this.filteredData.length;
-	if (datlen && datlen < maxH) maxH = datlen;
-	const h = itemH * maxH + 20;
-	this.list.style.height = `${h}px`;
 	this.highlight();
-
 	this.triggerEvent('change', [this]);
 	return this;
 };
@@ -383,16 +364,16 @@ Drops.prototype.highlight = function (name) {
 
 
 Drops.prototype.getItems = function () {
-	return this.data;
+	return this.data.filter(i => i.name !== '..');
 };
 
 Drops.prototype.getFilteredItems = function () {
-	return this.filteredData;
+	return this.filteredData.filter(i => i.name !== '..');
 };
 
-Drops.prototype.getSelectedItems = function () {
-	let items = this.selectedItems;
-	if (!items || !items.length) {
+Drops.prototype.getSelectedItems = function (getHighlightedIfNothingSelected) {
+	let items = this.selectedItems.filter(i => i.name !== '..');
+	if (!items.length && getHighlightedIfNothingSelected) {
 		this.state.selectedItem = this.filteredData[this.state.selectedIndex];
 		items = [this.state.selectedItem];
 	}
@@ -409,8 +390,8 @@ Drops.prototype.getSelectedIndex = function () {
 };
 
 Drops.prototype.getItemByIdx = function (idx) {
-	if (idx < 1) return;
-	if (idx >= this.filteredData.length) return;
+	if (idx >= this.filteredData.length) idx = this.filteredData.length - 1;
+	if (idx < 0) idx = 0;
 	return this.filteredData[idx];
 };
 

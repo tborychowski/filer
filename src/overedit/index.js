@@ -64,7 +64,7 @@ Overedit.prototype.cancel = function () {
 
 Overedit.prototype.save = function () {
 	if (!this.state.rendered) return this;
-	let name = this.input.value.trim();
+	let name = this.input.value;
 	if (typeof this.config.validator === 'function') {
 		if (!this.config.validator(name)) {
 			this.input.select();

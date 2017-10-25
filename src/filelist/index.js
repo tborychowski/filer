@@ -16,8 +16,8 @@ function itemRenderer (item) {
 
 function fileNameValidator (name) {
 	let er = '';
-	if (/^[0-9a-zA-Z. ()]+$/.test(name) === false) er = 'Incorrect name';
-	const items = drops.getItems().map(i => i.name).filter(i => i !== '..');
+	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) er = 'Incorrect name';
+	const items = drops.getItems().map(i => i.name);
 	if (items.includes(name) && name !== fileNameEditMode) er = 'Name already exists';
 	if (!er) return true;
 	console.log(er);
@@ -99,10 +99,16 @@ function newFolder () {
 
 
 function doDelete (item) {
-	const prevItem = drops.getItemByIdx(drops.getSelectedIndex() + 1);
+	const idx = drops.getSelectedIndex();
 	Files
 		.rm(item.path)
-		.then(() => reload(prevItem.name));
+		.then(() => {
+			drops.reload().then(() => {
+				const prevItem = drops.getItemByIdx(idx);
+				drops.highlight(prevItem.name);
+				$.trigger(EVENT.dir.changed, currentDir);
+			});
+		});
 
 }
 
@@ -119,12 +125,12 @@ function del () {
 
 function cut () {
 	if (fileNameEditMode) return;
-	console.log('cut', drops.getSelectedItems());
+	console.log('cut', drops.getSelectedItems(true));
 }
 
 function copy () {
 	if (fileNameEditMode) return;
-	console.log('copy', drops.getSelectedItems());
+	console.log('copy', drops.getSelectedItems(true));
 }
 
 function paste () {

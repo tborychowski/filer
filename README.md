@@ -5,15 +5,14 @@ A File Manager for the Keyboard People.
 
 # TODO
 
-- core: new folder, new file
-- core: delete, copy, cut & paste (visual & progress)
+- core: copy, cut & paste (visual & progress)
 
 - addon: open terminal here
 - addon: open finder here
 - addon: open any app (sublime) here...
 - git: open repo here
 
-- core: regex filter
+- core: regex filtering
 - core: bulk rename
 - core: cache folders, and bg sync
 - core: settings (json?)
@@ -24,7 +23,10 @@ A File Manager for the Keyboard People.
 
 - undo/redo (operation history)
 
+
+
 - statusbar: async folder size?
+- core: new file
 
 - https://www.npmjs.com/package/electron-command-palette
 
