@@ -1,4 +1,4 @@
-const { $ } = require('../core');
+const isAlpha = e => (e.keyCode >= 65 && e.keyCode <= 90 && !e.ctrlKey && !e.metaKey);
 
 
 function Drops (target, config = { valueField: 'name' }) {
@@ -147,11 +147,12 @@ Drops.prototype.onKeydown = function (e) {
 		return fnmap[key]();
 	}
 
-	if ($.isAlpha(e) && navMode) return this.input.focus();
+	if (isAlpha(e) && navMode) return this.input.focus();
 };
 
 
 Drops.prototype.onClick = function (e) {
+	if (this.state.locked) return this;
 	const target = e.target.closest('.drops-list-item');
 	if (!target) return;
 	this.state.selectedIndex = Array.from(target.parentNode.children).indexOf(target);
@@ -160,6 +161,7 @@ Drops.prototype.onClick = function (e) {
 
 
 Drops.prototype.onFocus = function () {
+	if (this.state.locked) return this;
 	this.input.select();
 	this.state.focused = true;
 	return this;
@@ -286,26 +288,13 @@ Drops.prototype.pageDown = function () {
 };
 
 
-
-Drops.prototype.getItems = function () {
-	return this.data;
-};
-
-Drops.prototype.getFilteredItems = function () {
-	return this.filteredData;
-};
-
-Drops.prototype.getSelectedItems = function () {
-	return this.selectedItems;
-};
-
 Drops.prototype.getElFromIdx = function (idx) {
 	if (idx > -1) return this.list.querySelector(`.drops-list-item:nth-child(${idx + 1})`);
 };
 
 
 Drops.prototype.selectItem = function () {
-	if (this.state.focused) return;
+	if (this.state.focused || this.state.locked) return this;
 
 	const item = this.filteredData[this.state.selectedIndex];
 	this.state.selectedItem = item;
@@ -327,6 +316,7 @@ Drops.prototype.selectItem = function () {
 
 
 Drops.prototype.selectAll = function () {
+	if (this.state.locked) return this;
 	this.selectedItems = Array.from(this.filteredData);
 	this.list.querySelectorAll('.drops-list-item.selectable')
 		.forEach(el => el.classList.add('selected'));
@@ -335,6 +325,7 @@ Drops.prototype.selectAll = function () {
 };
 
 Drops.prototype.unselectAll = function () {
+	if (this.state.locked) return this;
 	this.selectedItems = [];
 	this.list.querySelectorAll('.drops-list-item.selected')
 		.forEach(el => el.classList.remove('selected'));
@@ -361,6 +352,7 @@ Drops.prototype.on = function (eventName, cb) {
 Drops.prototype.reload = function () {
 	this.unselectAll();
 	this.state.selectedIndex = 0;
+	this.state.locked = false;
 	this.input.value = '';
 	this.input.blur();
 	return this.load();
@@ -368,22 +360,68 @@ Drops.prototype.reload = function () {
 
 
 Drops.prototype.highlight = function (name) {
+	if (this.state.locked) return this;
 	if (name) {
 		this.state.selectedIndex = this.filteredData.findIndex(item => item.name === name);
 	}
+	if (this.state.selectedIndex === -1) this.state.selectedIndex = 0;
 
 	const idx = this.state.selectedIndex;
 	this.list
 		.querySelectorAll('.drops-list-item')
 		.forEach(i => { i.classList.remove('highlighted'); });
-	let selected = this.getElFromIdx(idx);
-	if (selected) {
-		selected.classList.add('highlighted');
-		selected.scrollIntoViewIfNeeded();
+	this.state.selectedEl = this.getElFromIdx(idx);
+	if (this.state.selectedEl) {
+		this.state.selectedEl.classList.add('highlighted');
+		this.state.selectedEl.scrollIntoViewIfNeeded();
 	}
 	return this;
 };
 
+
+
+
+
+Drops.prototype.getItems = function () {
+	return this.data;
+};
+
+Drops.prototype.getFilteredItems = function () {
+	return this.filteredData;
+};
+
+Drops.prototype.getSelectedItems = function () {
+	let items = this.selectedItems;
+	if (!items || !items.length) {
+		this.state.selectedItem = this.filteredData[this.state.selectedIndex];
+		items = [this.state.selectedItem];
+	}
+	return items;
+};
+
+Drops.prototype.getSelectedItem = function () {
+	this.state.selectedItem = this.filteredData[this.state.selectedIndex];
+	return Object.assign({}, this.state.selectedItem, { el: this.state.selectedEl });
+};
+
+Drops.prototype.getSelectedIndex = function () {
+	return this.state.selectedIndex;
+};
+
+Drops.prototype.getItemByIdx = function (idx) {
+	if (idx < 1) return;
+	if (idx >= this.filteredData.length) return;
+	return this.filteredData[idx];
+};
+
+
+Drops.prototype.lock = function () {
+	this.state.locked = true;
+};
+
+Drops.prototype.unlock = function () {
+	this.state.locked = false;
+};
 
 
 if (typeof module === 'object') module.exports = Drops;

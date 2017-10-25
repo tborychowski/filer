@@ -33,8 +33,7 @@
     "git-state": "^4.0.0",
     "javascript-natural-sort": "^0.7.1",
     "lodash.get": "^4.4.2",
-    "lodash.isequal": "^4.5.0",
-    "lodash.merge": "^4.6.0"
+    "lodash.isequal": "^4.5.0"
   },
   "devDependencies": {
     "electron": "^1.7.9",

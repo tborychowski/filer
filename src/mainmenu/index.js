@@ -19,6 +19,9 @@ const menuTemplate = [
 			option('Preferences...', 'CmdOrCtrl+,', EVENT.settings.show),
 			{ type: 'separator' },
 
+			{ role: 'services', submenu: [] },
+			{ type: 'separator' },
+
 			{ role: 'hide' },
 			{ role: 'hideothers' },
 			{ role: 'unhide' },
@@ -30,23 +33,27 @@ const menuTemplate = [
 	{
 		label: 'Edit',
 		submenu: [
-			{ role: 'undo' },
-			{ role: 'redo' },
+			option('Undo', 'CmdOrCtrl+Z', EVENT.filelist.undo),
+			option('Redo', 'CmdOrCtrl+Shift+Z', EVENT.filelist.redo),
 			{ type: 'separator' },
 
 			option('Cut', 'CmdOrCtrl+X', EVENT.filelist.cut),
 			option('Copy', 'CmdOrCtrl+C', EVENT.filelist.copy),
 			option('Paste', 'CmdOrCtrl+V', EVENT.filelist.paste),
 			option('Delete', 'CmdOrCtrl+Backspace', EVENT.filelist.delete),
-			{ type: 'separator' },
 
 			option('Rename', 'CmdOrCtrl+Enter', EVENT.filelist.rename),
+			{ type: 'separator' },
+
+
+			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
 			{ type: 'separator' },
 
 			option('Select', 'Space', EVENT.filelist.select),
 			option('Select All', 'CmdOrCtrl+A', EVENT.filelist.selectall),
 			option('Deselect All', 'CmdOrCtrl+Shift+A', EVENT.filelist.unselectall),
 			{ type: 'separator' },
+
 			option('Find', 'CmdOrCtrl+F', EVENT.search.start),
 		]
 	},
@@ -55,15 +62,15 @@ const menuTemplate = [
 		submenu: [
 			{ role: 'reload' },
 			{ type: 'separator' },
+
+			option('Toggle Hidden', 'CmdOrCtrl+.', EVENT.filelist.togglehidden),
+			{ type: 'separator' },
+
 			{ role: 'togglefullscreen' }
 		]
 	},
 	{
-		role: 'window',
-		submenu: [
-			{ role: 'minimize' },
-			{ role: 'close' }
-		]
+		role: 'windowMenu'
 	},
 	{
 		label: 'Dev',

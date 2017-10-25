@@ -1,10 +1,11 @@
-const { $, EVENT, helper } = require('../core');
+const { $, EVENT, helper, dialog } = require('../core');
 const { Files, Config } = require('../services');
 const Drops = require('../drops');
+const Overedit = require('../overedit');
 const Breadcrumbs = require('../breadcrumbs');
 const sep = helper.pathSep;
-let drops, currentDir;
-
+let drops, currentDir, showHidden;
+let fileNameEditMode = false;
 
 function itemRenderer (item) {
 	const name = item.highlighted ? item.highlighted.name : item.name;
@@ -13,26 +14,40 @@ function itemRenderer (item) {
 }
 
 
+function fileNameValidator (name) {
+	let er = '';
+	if (/^[0-9a-zA-Z. ()]+$/.test(name) === false) er = 'Incorrect name';
+	const items = drops.getItems().map(i => i.name).filter(i => i !== '..');
+	if (items.includes(name) && name !== fileNameEditMode) er = 'Name already exists';
+	if (!er) return true;
+	console.log(er);
+}
+
+function reload (dir) {
+	return drops.reload().then(() => {
+		if (dir) drops.highlight(dir);
+		$.trigger(EVENT.dir.changed, currentDir);
+	});
+}
+
 function gotoDir (dir = helper.homeDir, previousDir) {
 	if (dir === currentDir) return;
 	currentDir = dir;
 	Config.set('currentDir', dir);
 	Breadcrumbs.set(dir);
-	drops.reload().then(() => {
-		if (previousDir) drops.highlight(previousDir);
-		$.trigger(EVENT.dir.changed, currentDir);
-	});
+	reload(previousDir);
 }
 
 
-
 function goUp () {
+	if (fileNameEditMode) return;
 	const ar = currentDir.split(sep);
 	const prev = ar.pop();
 	gotoDir(ar.join(sep), prev);
 }
 
 function enterFolder (e, item) {
+	if (fileNameEditMode) return;
 	if (item.isDir) {
 		if (item.name === '..') goUp();
 		else gotoDir(item.path);
@@ -40,29 +55,97 @@ function enterFolder (e, item) {
 	else helper.openFile(item.path);
 }
 
-function rename (e, item) {
-	console.log('rename', item);
+
+function toggleHidden () {
+	if (fileNameEditMode) return;
+	showHidden = !showHidden;
+	Config.set('showHidden', showHidden);
+	reload(drops.getSelectedItem().name);
 }
 
-function del (e, item) {
-	console.log('delete', item);
+
+function rename () {
+	if (fileNameEditMode) return;
+	const item = drops.getSelectedItem();
+	if (item.name === '..') return;
+	fileNameEditMode = item.name;
+	drops.lock();
+	Overedit(item.el, { value: item.name, validator: fileNameValidator })
+		.on('save', newName => {
+			drops.unlock();
+			Files
+				.rename(item, newName)
+				.then(() => reload(newName));
+		})
+		.on('done', () => { fileNameEditMode = false; });
+}
+
+
+function getNextFolderName () {
+	const items = drops.getItems().map(i => i.name).filter(i => i !== '..');
+	let i = 1, name = 'New Folder';
+	while (items.includes(name)) name = `New Folder (${i++})`;
+	return name;
+}
+
+function newFolder () {
+	if (fileNameEditMode) return;
+	const name = getNextFolderName();
+	Files
+		.mkdir(currentDir, name)
+		.then(() => reload(name))
+		.then(rename);
+}
+
+
+function doDelete (item) {
+	const prevItem = drops.getItemByIdx(drops.getSelectedIndex() + 1);
+	Files
+		.rm(item.path)
+		.then(() => reload(prevItem.name));
+
+}
+
+function del () {
+	if (fileNameEditMode) return;
+	const item = drops.getSelectedItem();
+	if (item.name === '..') return;
+	dialog
+		.question({ message: `Delete "${item.name}"?` })
+		.then(res => {
+			if (res) doDelete(item);
+		});
 }
 
 function cut () {
+	if (fileNameEditMode) return;
 	console.log('cut', drops.getSelectedItems());
 }
 
 function copy () {
+	if (fileNameEditMode) return;
 	console.log('copy', drops.getSelectedItems());
 }
 
 function paste () {
+	if (fileNameEditMode) return;
 	console.log('paste', currentDir);
 }
 
+
+
+function dropsAction (action) {
+	return () => {
+		if (!fileNameEditMode && typeof drops[action] === 'function') drops[action]();
+	};
+}
+
+
 function init () {
+	showHidden = Config.get('showHidden');
+
 	drops = new Drops('.file-list', {
-		dataSrc: () => Files.readDir(currentDir),
+		dataSrc: () => Files.readDir(currentDir, { showHidden }),
 		itemRenderer,
 		valueField: 'path',
 		searchInFields: ['name', 'path'],
@@ -77,18 +160,22 @@ function init () {
 		console.log('filelist:', e);
 	});
 
-	drops.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d));
+	drops.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d)); // update statusbar
 
 
+	// $.on(EVENT.filelist.undo, undo);
+	// $.on(EVENT.filelist.redo, redo);
 	$.on(EVENT.filelist.cut, cut);
 	$.on(EVENT.filelist.copy, copy);
 	$.on(EVENT.filelist.paste, paste);
 	$.on(EVENT.filelist.delete, del);
 	$.on(EVENT.filelist.rename, rename);
-	$.on(EVENT.filelist.select, () => drops.selectItem());
-	$.on(EVENT.filelist.selectall, () => drops.selectAll());
-	$.on(EVENT.filelist.unselectall, () => drops.unselectAll());
-	$.on(EVENT.search.start, () => drops.onFocus());
+	$.on(EVENT.filelist.newfolder, newFolder);
+	$.on(EVENT.filelist.togglehidden, toggleHidden);
+	$.on(EVENT.filelist.select, dropsAction('selectItem'));
+	$.on(EVENT.filelist.selectall, dropsAction('selectAll'));
+	$.on(EVENT.filelist.unselectall, dropsAction('unselectAll'));
+	$.on(EVENT.search.start, dropsAction('onFocus'));
 
 	gotoDir(Config.get('currentDir'));
 }

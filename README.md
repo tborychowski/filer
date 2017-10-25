@@ -6,12 +6,15 @@ A File Manager for the Keyboard People.
 # TODO
 
 - core: new folder, new file
-- open terminal here
-- open finder here
-- open any app (sublime) here...
-- git: open repo here
-- copy, cut & paste (visual & progress)
+- core: delete, copy, cut & paste (visual & progress)
 
+- addon: open terminal here
+- addon: open finder here
+- addon: open any app (sublime) here...
+- git: open repo here
+
+- core: regex filter
+- core: bulk rename
 - core: cache folders, and bg sync
 - core: settings (json?)
 - bookmarks bar - store fav folders...
@@ -19,8 +22,11 @@ A File Manager for the Keyboard People.
 
 - cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
 
-- statusbar
-    - async folder size?
+- undo/redo (operation history)
+
+- statusbar: async folder size?
+
+- https://www.npmjs.com/package/electron-command-palette
 
 
 

@@ -1,7 +1,6 @@
 const { $, EVENT } = require('../core');
 const { Git } = require('../services');
 const _isEqual = require('lodash.isequal');
-const _merge = require('lodash.merge');
 
 
 let el, elFiles, elSelected, elGit, state;
@@ -43,7 +42,7 @@ function updateGitSection () {
 
 
 function updateState (updates) {
-	const newState = _merge({}, state, updates);
+	const newState = Object.assign({}, state, updates);
 	if (!_isEqual(state, newState)) state = newState;
 	if (updates.items) updateFilesSection();
 	if (updates.dir) updateGitSection();

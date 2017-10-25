@@ -11,15 +11,21 @@ module.exports = {
 	filelist: {
 		changed: 'filelist-changed',
 
+		undo: 'filelist-undo',
+		redo: 'filelist-redo',
+
 		copy: 'filelist-copy',
 		cut: 'filelist-cut',
 		paste: 'filelist-paste',
 		delete: 'filelist-delete',
-
 		rename: 'filelist-rename',
+
+		newfolder: 'filelist-new-folder',
+		togglehidden: 'toggle-hidden',
+
 		select: 'filelist-select',
-		selectall: 'filelist-selectall',
-		unselectall: 'filelist-unselectall',
+		selectall: 'filelist-select-all',
+		unselectall: 'filelist-un-select-all',
 	},
 
 	search: {

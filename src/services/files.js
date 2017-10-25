@@ -1,5 +1,6 @@
 const FS = require('fs-extra');
 const PATH = require('path');
+const {shell} = require('electron');
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
 const sep = helper.pathSep;
@@ -7,8 +8,8 @@ const sep = helper.pathSep;
 
 const dotRegEx = /^\./;
 
-let CASE_SENSITIVE = false;
-let SHOW_HIDDEN = false;
+let CASE_SENSITIVE = false;	// for sorting
+
 
 const FILE_TYPES = {
 	code: { js: 1, css: 1, html: 1, php: 1, xml: 1, json: 1, ts: 1, sh: 1 },
@@ -22,6 +23,9 @@ const FILE_TYPES = {
 	excel: { xls: 1, xlsx: 1 },
 	powerpoint: { ppt: 1, pptx: 1 },
 };
+
+// /some/long/path => /some/long
+const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
 
 
 function findFileIcon (ext = '') {
@@ -37,13 +41,13 @@ function getIconCls (file) {
 }
 
 
-function sortFiles (dirPath, fileList) {
+function sortFiles (dirPath, fileList, options) {
 	if (!Array.isArray(fileList)) return [];
 
 	const isNotHidden = name => !dotRegEx.test(name);
 
 	naturalSort.insensitive = !CASE_SENSITIVE;
-	if (!SHOW_HIDDEN) fileList = fileList.filter(isNotHidden);
+	if (!options.showHidden) fileList = fileList.filter(isNotHidden);
 	return fileList.sort(naturalSort);
 }
 
@@ -78,7 +82,7 @@ function addFolderUp (dirPath, fileList) {
 	if (dirPath !== sep) {
 		fileList.unshift({
 			name: '..',
-			path: dirPath.split(sep).slice(0, -1).join(sep),
+			path: dropLastSegment(dirPath),
 			isHidden: false,
 			isDir: true,
 			unselectable: true
@@ -87,16 +91,36 @@ function addFolderUp (dirPath, fileList) {
 	return fileList;
 }
 
-function readDir (path) {
+function readDir (path, options = { showHidden: false }) {
 	if (!path) path = '/';
 	return FS.readdir(path)
-		.then(files => sortFiles(path, files))
+		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
 		.then(files => addFolderUp(path, files))
 		.catch(console.error.bind(console));
 }
 
 
+function rename (item, newName) {
+	const path = dropLastSegment(item.path) + sep;
+	// undo: rename(path + newName, path + item.name);
+	return FS.rename(path + item.name, path + newName);
+}
+
+
+function mkdir (path, name) {
+	return FS.mkdir(path + sep + name)
+		.catch(e => console.log(e));
+}
+
+
+function rm (path) {
+	return Promise.resolve(shell.moveItemToTrash(path));
+}
+
 module.exports = {
-	readDir
+	readDir,
+	rename,
+	mkdir,
+	rm,
 };

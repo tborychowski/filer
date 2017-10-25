@@ -119,5 +119,5 @@ module.exports = {
 	isAlpha,
 	isMath,
 	isAlphaNumeric,
-	isNumberField
+	isNumberField,
 };

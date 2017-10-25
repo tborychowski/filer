@@ -18,7 +18,7 @@ function info ({ title = '', message = '', detail = '' }) {
 }
 
 
-function question ({ title, message, detail, buttons}) {
+function question ({ title = 'Question', message, detail, buttons = ['No', 'Yes']}) {
 	return new Promise(resolve => {
 		dialog.showMessageBox({
 			type: 'question',

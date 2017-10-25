@@ -51,5 +51,5 @@ gulp.task('a', ['electron'], () => {
 });
 
 
-gulp.task('default', ['build']);
+gulp.task('default', ['a']);
 
