@@ -1,6 +1,6 @@
 const { $ } = require('../core');
 
-const el = $('.breadcrumbs');
+let el;
 
 
 function set (path) {
@@ -8,6 +8,12 @@ function set (path) {
 }
 
 
+function init () {
+	el = $('.breadcrumbs');
+
+}
+
 module.exports = {
+	init,
 	set
 };

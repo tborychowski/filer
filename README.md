@@ -6,10 +6,6 @@ A File Manager for the Keyboard People.
 # TODO
 
 - core: new folder, new file
-- statusbar
-    - "3 selected, 10 items"
-    - async folder size?
-    - git status, repo name, etc.
 - open terminal here
 - open finder here
 - open any app (sublime) here...
@@ -22,6 +18,10 @@ A File Manager for the Keyboard People.
 - breadcrumbs: make it nicer and clickable?
 
 - cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
+
+- statusbar
+    - async folder size?
+
 
 
 ## Dev install

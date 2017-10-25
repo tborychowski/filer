@@ -17,6 +17,7 @@ function Drops (target, config = { valueField: 'name' }) {
 		keydown: [],
 		dblclick: [],
 		click: [],
+		change: [],				// any change to the view (select, filter, etc.)
 	};
 	this.state = {
 		focused: false,
@@ -35,7 +36,6 @@ function Drops (target, config = { valueField: 'name' }) {
 		}
 	});
 
-	// this.load().then(this.filter);
 	return this.render().initEvents();
 }
 
@@ -100,8 +100,10 @@ Drops.prototype.updateList = function () {
 	if (datlen && datlen < maxH) maxH = datlen;
 	const h = itemH * maxH + 20;
 	this.list.style.height = `${h}px`;
+	this.highlight();
 
-	return this.highlight();
+	this.triggerEvent('change', [this]);
+	return this;
 };
 
 
@@ -187,6 +189,7 @@ Drops.prototype.triggerEvent = function (event, params) {
 		this.state.selectedItem = this.filteredData[this.state.selectedIndex];
 		params = [this.state.selectedItem];
 	}
+	if (typeof event === 'string') event = { type: event, name: event };
 	params = [event].concat(params);
 	if (this.eventListeners[event.type]) {
 		this.eventListeners[event.type].forEach(cb => { cb.apply(cb, params); });
@@ -284,6 +287,13 @@ Drops.prototype.pageDown = function () {
 
 
 
+Drops.prototype.getItems = function () {
+	return this.data;
+};
+
+Drops.prototype.getFilteredItems = function () {
+	return this.filteredData;
+};
 
 Drops.prototype.getSelectedItems = function () {
 	return this.selectedItems;
@@ -311,6 +321,7 @@ Drops.prototype.selectItem = function () {
 		this.selectedItems.push(item);
 		el.classList.add('selected');
 	}
+	this.triggerEvent('change', [this]);
 	return this.down();
 };
 
@@ -319,6 +330,7 @@ Drops.prototype.selectAll = function () {
 	this.selectedItems = Array.from(this.filteredData);
 	this.list.querySelectorAll('.drops-list-item.selectable')
 		.forEach(el => el.classList.add('selected'));
+	this.triggerEvent('change', [this]);
 	return this;
 };
 
@@ -326,6 +338,7 @@ Drops.prototype.unselectAll = function () {
 	this.selectedItems = [];
 	this.list.querySelectorAll('.drops-list-item.selected')
 		.forEach(el => el.classList.remove('selected'));
+	this.triggerEvent('change', [this]);
 	return this;
 };
 

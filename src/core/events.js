@@ -4,7 +4,13 @@ module.exports = {
 		keyup: 'document-keyup'
 	},
 
+	dir: {
+		changed: 'dir-changed'
+	},
+
 	filelist: {
+		changed: 'filelist-changed',
+
 		copy: 'filelist-copy',
 		cut: 'filelist-cut',
 		paste: 'filelist-paste',

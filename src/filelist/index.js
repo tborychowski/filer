@@ -20,6 +20,7 @@ function gotoDir (dir = helper.homeDir, previousDir) {
 	Breadcrumbs.set(dir);
 	drops.reload().then(() => {
 		if (previousDir) drops.highlight(previousDir);
+		$.trigger(EVENT.dir.changed, currentDir);
 	});
 }
 
@@ -76,6 +77,9 @@ function init () {
 		console.log('filelist:', e);
 	});
 
+	drops.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d));
+
+
 	$.on(EVENT.filelist.cut, cut);
 	$.on(EVENT.filelist.copy, copy);
 	$.on(EVENT.filelist.paste, paste);
@@ -86,7 +90,7 @@ function init () {
 	$.on(EVENT.filelist.unselectall, () => drops.unselectAll());
 	$.on(EVENT.search.start, () => drops.onFocus());
 
-	gotoDir();
+	gotoDir(Config.get('currentDir'));
 }
 
 
