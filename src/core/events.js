@@ -1,4 +1,8 @@
 module.exports = {
+	clipboard: {
+		changed: 'clipboard-changed'
+	},
+
 	document: {
 		clicked: 'document-clicked',
 		keyup: 'document-keyup'

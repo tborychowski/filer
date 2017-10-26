@@ -1,19 +1,25 @@
 @require '_lib'
 
 header
+	position absolute
+	left 0
+	right 0
+	top 0
+	height header-h
+
 	display flex
-	padding 0 20px
+	padding 0 10px 0 85px
 	background #eee
 	align-items center
-	min-height 40px
-	border-top 1px solid #f5f5f5
+	min-height 38px
+	border-top 1px solid #ccc
 	border-bottom 1px solid #ccc
+	-webkit-app-region drag
 
 
-.breadcrumbs
+.header-filler
 	flex 3
-	font inherit
-	color #333
+
 
 
 .search-input
@@ -21,7 +27,7 @@ header
 	font inherit
 	border none
 	border-radius 3px
-	padding 5px 10px
+	padding 3px 10px
 	box-shadow 0 0 0 1px #ccc
 
 	&::placeholder

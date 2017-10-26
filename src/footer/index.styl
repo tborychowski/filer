@@ -1,28 +1,39 @@
 @require '_lib'
 
 footer
+	position absolute
+	left 0
+	right 0
+	bottom 0
+	height footer-h
+
 	display flex
-	min-height 26px
 	padding 0 20px
 	background #eee
 	align-items center
 	justify-content space-between
 	border-top 1px solid #ccc
+	border-bottom 1px solid #ccc
 	box-shadow 0 1px 0 #f5f5f5 inset
+	font-size 13px
 
-	div
-		margin 0 2em
+	i
+		margin-right 5px
+
+	.footer-stats
+		display flex
+
+	.footer-stats-item
+		margin 0 1.4em
 		white-space nowrap
 
-		i
-			margin-right 5px
 
-	.dirty
+	.git-dirty
 		color maroon
 
-	.clean
+	.git-clean
 		color darkgreen
 
 
-.statusbar-filler
+.footer-filler
 	flex 1

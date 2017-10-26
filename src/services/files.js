@@ -1,6 +1,8 @@
+const {shell} = require('electron');
 const FS = require('fs-extra');
 const PATH = require('path');
-const {shell} = require('electron');
+const Copy = require('copy');
+
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
 const sep = helper.pathSep;
@@ -118,9 +120,25 @@ function rm (path) {
 	return Promise.resolve(shell.moveItemToTrash(path));
 }
 
+function copy (items, path) {
+	const src = items.map(i => i.path);
+	return new Promise((resolve, reject) => {
+		Copy.each(src, path, (err, files) => {
+			if (err) return reject(err);
+			resolve(files);
+		});
+	});
+}
+
+function move (items, path) {
+	return Promise.resolve();
+}
+
 module.exports = {
 	readDir,
 	rename,
 	mkdir,
 	rm,
+	copy,
+	move,
 };

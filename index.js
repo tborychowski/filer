@@ -14,6 +14,7 @@ function createWindow () {
 		y: mainWindowState.y,
 		width: mainWindowState.width,
 		height: mainWindowState.height,
+		titleBarStyle: 'hidden-inset',
 	});
 	win.on('closed', () => win = null);
 	win.webContents.on('crashed', () => { win.destroy(); createWindow(); });

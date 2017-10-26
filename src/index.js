@@ -4,7 +4,10 @@ helper.init([
 	'mainmenu',
 	'header',
 	'footer',
-	'filelist',
+	'breadcrumbs',
+	'palette',
+
+	'filelist',	// better put it last
 ]);
 
 

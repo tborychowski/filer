@@ -226,6 +226,8 @@ Drops.prototype.highlightFilter = function (q) {
 
 
 Drops.prototype.filter = function () {
+	if (this.state.locked) return this;
+	this.unselectAll();
 	const q = this.input && this.input.value || '';
 	if (!this.data) return this;
 	if (!q) this.filteredData = Array.from(this.data);
@@ -372,12 +374,12 @@ Drops.prototype.getFilteredItems = function () {
 };
 
 Drops.prototype.getSelectedItems = function (getHighlightedIfNothingSelected) {
-	let items = this.selectedItems.filter(i => i.name !== '..');
+	let items = this.selectedItems;
 	if (!items.length && getHighlightedIfNothingSelected) {
 		this.state.selectedItem = this.filteredData[this.state.selectedIndex];
 		items = [this.state.selectedItem];
 	}
-	return items;
+	return items.filter(i => i.name !== '..');
 };
 
 Drops.prototype.getSelectedItem = function () {
