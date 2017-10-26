@@ -1,19 +1,19 @@
-const { $ } = require('../core');
+const { $, EVENT } = require('../core');
 
 let el;
 
 
-function set (path) {
+function onDirChanged (path) {
 	el.html(path);
 }
 
 
 function init () {
 	el = $('.breadcrumbs');
+	$.on(EVENT.dir.changed, onDirChanged);
 
 }
 
 module.exports = {
 	init,
-	set
 };

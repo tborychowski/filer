@@ -1,32 +1,23 @@
-const { $, EVENT, helper, dialog } = require('../core');
-const { Files, Config, Clipboard } = require('../services');
-const Drops = require('../drops');
-const Overedit = require('../overedit');
-const Breadcrumbs = require('../breadcrumbs');
+const { $, EVENT, helper, dialog, config } = require('../core');
+const { Files, Clipboard } = require('../services');
+const ListView = require('./list-view');
+const ListEdit = require('./list-edit');
 
 const sep = helper.pathSep;
-let drops, currentDir, showHidden;
+let listView, currentDir;
 let fileNameEditMode = false;
-
-function itemRenderer (item) {
-	const name = item.highlighted ? item.highlighted.name : item.name;
-	return `<i class="file-icon ${item.cls}"></i>
-		<span class="file-name">${name}</span>`;
-}
-
 
 function fileNameValidator (name) {
 	let er = '';
 	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) er = 'Incorrect name';
-	const items = drops.getItems().map(i => i.name);
+	const items = listView.getItems().map(i => i.name);
 	if (items.includes(name) && name !== fileNameEditMode) er = 'Name already exists';
 	if (!er) return true;
 	console.log(er);
 }
 
 function reload (dir) {
-	return drops.reload().then(() => {
-		if (dir) drops.highlight(dir);
+	return listView.reload(dir).then(() => {
 		$.trigger(EVENT.dir.changed, currentDir);
 	});
 }
@@ -34,8 +25,7 @@ function reload (dir) {
 function gotoDir (dir = helper.homeDir, previousDir) {
 	if (dir === currentDir) return;
 	currentDir = dir;
-	Config.set('currentDir', dir);
-	Breadcrumbs.set(dir);
+	config.set('currentDir', dir);
 	reload(previousDir);
 }
 
@@ -59,21 +49,20 @@ function enterFolder (e, item) {
 
 function toggleHidden () {
 	if (fileNameEditMode) return;
-	showHidden = !showHidden;
-	Config.set('showHidden', showHidden);
-	reload(drops.getSelectedItem().name);
+	config.set('showHidden', !config.get('showHidden'));
+	reload(listView.getSelectedItem().name);
 }
 
 
 function rename () {
 	if (fileNameEditMode) return;
-	const item = drops.getSelectedItem();
+	const item = listView.getSelectedItem();
 	if (item.name === '..') return;
 	fileNameEditMode = item.name;
-	drops.lock();
-	Overedit(item.el, { value: item.name, validator: fileNameValidator })
+	listView.lock();
+	ListEdit(item.el, { value: item.name, validator: fileNameValidator })
 		.on('save', newName => {
-			drops.unlock();
+			listView.unlock();
 			Files
 				.rename(item, newName)
 				.then(() => reload(newName));
@@ -83,7 +72,7 @@ function rename () {
 
 
 function getNextFolderName () {
-	const items = drops.getItems().map(i => i.name).filter(i => i !== '..');
+	const items = listView.getItems().map(i => i.name).filter(i => i !== '..');
 	let i = 1, name = 'New Folder';
 	while (items.includes(name)) name = `New Folder (${i++})`;
 	return name;
@@ -99,35 +88,21 @@ function newFolder () {
 }
 
 
-function doDelete (item) {
-	const idx = drops.getSelectedIndex();
-	Files
-		.rm(item.path)
-		.then(() => {
-			drops.reload().then(() => {
-				const prevItem = drops.getItemByIdx(idx);
-				drops.highlight(prevItem.name);
-				$.trigger(EVENT.dir.changed, currentDir);
-			});
-		});
-
-}
-
 function del () {
 	if (fileNameEditMode) return;
-	const item = drops.getSelectedItem();
+	const item = listView.getSelectedItem();
 	if (item.name === '..') return;
 	dialog
 		.question({ message: `Delete "${item.name}"?` })
 		.then(res => {
-			if (res) doDelete(item);
+			if (res) Files.rm(item.path).then(() => reload());
 		});
 }
 
 
 function doClipboardAction (action) {
 	if (fileNameEditMode) return;
-	const items = drops.getSelectedItems(true);
+	const items = listView.getSelectedItems(true);
 	if (items.length) Clipboard.save({ action, items });
 }
 
@@ -140,39 +115,35 @@ function paste () {
 
 	Files[action](clip.items, currentDir).then(() => {
 		Clipboard.clear();
-		reload(drops.getSelectedItem().name);
+		reload(listView.getSelectedItem().name);
 	});
 }
 
 
 
-function dropsAction (action) {
+function listViewAction (action) {
 	return () => {
-		if (!fileNameEditMode && typeof drops[action] === 'function') drops[action]();
+		if (!fileNameEditMode && typeof listView[action] === 'function') listView[action]();
 	};
 }
 
 
 function init () {
-	showHidden = Config.get('showHidden');
-
-	drops = new Drops('.file-list', {
-		dataSrc: () => Files.readDir(currentDir, { showHidden }),
-		itemRenderer,
+	listView = new ListView('.file-list', {
+		dataSrc: () => Files.readDir(currentDir, { showHidden: config.get('showHidden') }),
 		valueField: 'path',
 		searchInFields: ['name'],
 	});
 
-	drops.on('dblclick', enterFolder);
+	listView.on('dblclick', enterFolder);
 
-
-	drops.on('keydown', (e, item) => {
+	listView.on('keydown', (e, item) => {
 		if (e.key === 'Backspace') return goUp();
 		if (e.key === 'Enter') return enterFolder(e, item);
 		console.log('filelist:', e);
 	});
 
-	drops.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d)); // update statusbar
+	listView.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d)); // update statusbar
 
 
 	// $.on(EVENT.filelist.undo, undo);
@@ -184,12 +155,12 @@ function init () {
 	$.on(EVENT.filelist.rename, rename);
 	$.on(EVENT.filelist.newfolder, newFolder);
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
-	$.on(EVENT.filelist.select, dropsAction('selectItem'));
-	$.on(EVENT.filelist.selectall, dropsAction('selectAll'));
-	$.on(EVENT.filelist.unselectall, dropsAction('unselectAll'));
-	$.on(EVENT.search.start, dropsAction('onFocus'));
+	$.on(EVENT.filelist.select, listViewAction('selectItem'));
+	$.on(EVENT.filelist.selectall, listViewAction('selectAll'));
+	$.on(EVENT.filelist.unselectall, listViewAction('unselectAll'));
+	$.on(EVENT.search.start, listViewAction('onFocus'));
 
-	gotoDir(Config.get('currentDir'));
+	gotoDir(config.get('currentDir'));
 }
 
 

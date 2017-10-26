@@ -49,13 +49,16 @@ Drops.prototype.load = function () {
 	});
 };
 
+
+
+
 Drops.prototype.getItemHtml = function (i) {
 	if (!i) return '';
-	let name = i.name;
 	let id = i[this.config.valueField] || '';
 	let cls = ['drops-list-item'];
 	cls.push(i.unselectable ? 'unselectable' : 'selectable');
-	if (typeof this.config.itemRenderer === 'function') name = this.config.itemRenderer(i);
+	const name = `<i class="file-icon ${i.cls}"></i>
+		<span class="file-name">${i.highlighted ? i.highlighted.name : i.name}</span>`;
 	return `<div class="${cls.join(' ')}" data-id="${id}">${name}</div>`;
 };
 
@@ -332,13 +335,15 @@ Drops.prototype.on = function (eventName, cb) {
 };
 
 
-Drops.prototype.reload = function () {
+Drops.prototype.reload = function (hldir) {
 	this.unselectAll();
-	this.state.selectedIndex = 0;
 	this.state.locked = false;
 	this.input.value = '';
 	this.input.blur();
-	return this.load();
+	return this.load().then(() => {
+		if (!hldir) hldir = this.getItemByIdx(this.state.selectedIndex).name;
+		this.highlight(hldir);
+	});
 };
 
 
