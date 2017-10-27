@@ -66,13 +66,13 @@ Overedit.prototype.save = function () {
 	if (!this.state.rendered) return this;
 	let name = this.input.value;
 	if (typeof this.config.validator === 'function') {
-		if (!this.config.validator(name)) {
+		if (this.config.validator(name) !== true) {
 			this.input.select();
 			return this;
 		}
 	}
 	this.state.rendered = false;		// chrome triggers blur and keydown in the same time
-	if (this.value !== name) this.triggerEvent('save', name);
+	this.triggerEvent('save', name);
 	return this.destroy();
 };
 

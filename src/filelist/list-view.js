@@ -336,6 +336,7 @@ Drops.prototype.on = function (eventName, cb) {
 
 
 Drops.prototype.reload = function (hldir) {
+	if (hldir === false) this.state.selectedIndex = 0;
 	this.unselectAll();
 	this.state.locked = false;
 	this.input.value = '';
@@ -349,12 +350,10 @@ Drops.prototype.reload = function (hldir) {
 
 Drops.prototype.highlight = function (name) {
 	if (this.state.locked) return this;
-	if (name) {
-		this.state.selectedIndex = this.filteredData.findIndex(item => item.name === name);
-	}
-	if (this.state.selectedIndex === -1) this.state.selectedIndex = 0;
-
-	const idx = this.state.selectedIndex;
+	let idx = this.state.selectedIndex;
+	if (name) idx = this.filteredData.findIndex(item => item.name === name);
+	if (idx === -1) idx = 0;
+	this.state.selectedIndex = idx;
 	this.list
 		.querySelectorAll('.drops-list-item')
 		.forEach(i => { i.classList.remove('highlighted'); });
@@ -402,6 +401,12 @@ Drops.prototype.getItemByIdx = function (idx) {
 	return this.filteredData[idx];
 };
 
+
+Drops.prototype.injectEmptyRowAfter = function (name = 'new item') {
+	this.state.selectedEl.classList.remove('highlighted');
+	this.state.selectedEl.insertAdjacentHTML('afterend', this.getItemHtml({name}));
+	return this.state.selectedEl.nextElementSibling;
+};
 
 Drops.prototype.lock = function () {
 	this.state.locked = true;

@@ -1,6 +1,6 @@
 const {shell} = require('electron');
 const FS = require('fs-extra');
-const PATH = require('path');
+const Path = require('path');
 const Copy = require('copy');
 
 const naturalSort = require('javascript-natural-sort');
@@ -30,6 +30,12 @@ const FILE_TYPES = {
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
 
 
+function ifNameValid (name) {
+	if (name === '.' || name === '..') return false;
+	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) return false;
+	return true;
+}
+
 function findFileIcon (ext = '') {
 	ext = ext.toLowerCase().substr(1);
 	for (let t in FILE_TYPES) if (ext in FILE_TYPES[t]) return `file-${t}-o`;
@@ -37,8 +43,8 @@ function findFileIcon (ext = '') {
 }
 
 
-function getIconCls (file) {
-	const cls = file.isDir ? 'folder' : findFileIcon(file.ext);
+function getIconCls (type, ext) {
+	let cls = (type === 'folder') ? type : findFileIcon(ext);
 	return `fa fa-${cls}`;
 }
 
@@ -54,20 +60,16 @@ function sortFiles (dirPath, fileList, options) {
 }
 
 
-function getFileDetails (dirPath, file) {
-	const path = PATH.join(dirPath, file);
+function getFileDetails (parentPath, name) {
+	const path = Path.join(parentPath, name);
 	const stats = FS.lstatSync(path);
-	const item = {
-		name: file,
-		path,
-		stats,
-		ext: PATH.extname(file),
-		isDir: stats.isDirectory(),
-		isFile: stats.isFile(),
-		isHidden: dotRegEx.test(file),
-	};
-	item.cls = getIconCls(item);
-	return item;
+	const isFile = stats.isFile();
+	const isDir = stats.isDirectory();
+	const type = isDir ? 'folder' : isFile ? 'file' : '';
+	const isHidden = dotRegEx.test(name);
+	const ext = Path.extname(name);
+	const cls = getIconCls(type, ext);
+	return { name, path, parentPath, type, isDir, isFile, ext, cls, isHidden };
 }
 
 
@@ -80,13 +82,15 @@ function getFilesDetails (dirPath, fileList) {
 
 
 // adds ".."
-function addFolderUp (dirPath, fileList) {
-	if (dirPath !== sep) {
+function addFolderUp (parentPath, fileList) {
+	if (parentPath !== sep) {
 		fileList.unshift({
 			name: '..',
-			path: dropLastSegment(dirPath),
+			path: dropLastSegment(parentPath),
+			parentPath,
 			isHidden: false,
 			isDir: true,
+			type: 'folder',
 			unselectable: true
 		});
 	}
@@ -104,15 +108,18 @@ function readDir (path, options = { showHidden: false }) {
 
 
 function rename (item, newName) {
-	const path = dropLastSegment(item.path) + sep;
-	// undo: rename(path + newName, path + item.name);
-	return FS.rename(path + item.name, path + newName);
+	const newPath = Path.join(item.parentPath, newName);
+	// undo: rename(newPath, item.path);
+	return FS.rename(item.path, newPath);
 }
 
 
 function mkdir (path, name) {
-	return FS.mkdir(path + sep + name)
-		.catch(e => console.log(e));
+	return FS.mkdir(Path.join(path, name)).catch(e => console.log(e));
+}
+
+function mkfile (path, name) {
+	return FS.ensureFile(Path.join(path, name)).catch(e => console.log(e));
 }
 
 
@@ -135,9 +142,11 @@ function move (items, path) {
 }
 
 module.exports = {
+	ifNameValid,
 	readDir,
 	rename,
 	mkdir,
+	mkfile,
 	rm,
 	copy,
 	move,

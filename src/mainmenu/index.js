@@ -47,6 +47,7 @@ const menuTemplate = [
 
 
 			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
+			option('New File', 'CmdOrCtrl+M', EVENT.filelist.newfile),
 			{ type: 'separator' },
 
 			option('Select', 'Space', EVENT.filelist.select),

@@ -7,30 +7,20 @@ A File Manager for the Keyboard People.
 
 - bookmarks bar - store history folders...
 	- command-palette
-
-
 - core: copy, cut & paste (visual & progress)
 	- use the real clipboard
 	https://github.com/electron/electron/issues/2244
-
-
 - addon: open terminal here
 - addon: open finder here
 - addon: open any app (sublime) here...
 - git: open repo here
-
 - core: regex filtering
 - core: bulk rename
 - core: cache folders, and bg sync
 - core: settings (json?)
 - breadcrumbs: make it nicer and clickable?
-
 - cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
-
 - undo/redo (operation history)
-
-
-
 - statusbar: async folder size?
 - core: new file
 

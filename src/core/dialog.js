@@ -23,7 +23,7 @@ function info ({ title = '', message = '', detail = '' }) {
 }
 
 
-function question ({ title = 'Question', message, detail, buttons = ['No', 'Yes']}) {
+function question ({ title = 'Question', message, detail, buttons = ['Yes', 'No']}) {
 	return new Promise(resolve => {
 		dialog.showMessageBox(win(), {
 			type: 'question',
@@ -32,7 +32,7 @@ function question ({ title = 'Question', message, detail, buttons = ['No', 'Yes'
 			detail,
 			buttons,
 			defaultId: 1,
-		}, res => { resolve(res); });
+		}, res => resolve(res));
 	});
 }
 

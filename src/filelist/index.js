@@ -8,21 +8,19 @@ let listView, currentDir;
 let fileNameEditMode = false;
 
 function fileNameValidator (name) {
-	let er = '';
-	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) er = 'Incorrect name';
-	const items = listView.getItems().map(i => i.name);
-	if (items.includes(name) && name !== fileNameEditMode) er = 'Name already exists';
-	if (!er) return true;
-	console.log(er);
+	if (!Files.ifNameValid(name)) return 'Incorrect name';
+	if (listView.getItems().map(i => i.name).includes(name)) return 'Name already exists';
+	return true;
 }
 
 function reload (dir) {
+	fileNameEditMode = false;
 	return listView.reload(dir).then(() => {
 		$.trigger(EVENT.dir.changed, currentDir);
 	});
 }
 
-function gotoDir (dir = helper.homeDir, previousDir) {
+function gotoDir (dir = helper.homeDir, previousDir = false) {
 	if (dir === currentDir) return;
 	currentDir = dir;
 	config.set('currentDir', dir);
@@ -71,20 +69,26 @@ function rename () {
 }
 
 
-function getNextFolderName () {
+function getNextName (itemName = 'Folder') {
 	const items = listView.getItems().map(i => i.name).filter(i => i !== '..');
-	let i = 1, name = 'New Folder';
-	while (items.includes(name)) name = `New Folder (${i++})`;
+	let i = 1, name = `New ${itemName}`;
+	while (items.includes(name)) name = `New ${itemName} (${i++})`;
 	return name;
 }
 
-function newFolder () {
+
+function newItem (action = 'mkdir') {
 	if (fileNameEditMode) return;
-	const name = getNextFolderName();
-	Files
-		.mkdir(currentDir, name)
-		.then(() => reload(name))
-		.then(rename);
+	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
+	const el = listView.injectEmptyRowAfter(name);
+	fileNameEditMode = name;
+	listView.lock();
+
+	ListEdit(el, { value: name, validator: fileNameValidator })
+		.on('save', newName => {
+			Files[action](currentDir, newName).then(() => reload(newName));
+		})
+		.on('cancel', () => reload());
 }
 
 
@@ -95,7 +99,7 @@ function del () {
 	dialog
 		.question({ message: `Delete "${item.name}"?` })
 		.then(res => {
-			if (res) Files.rm(item.path).then(() => reload());
+			if (res === 0) Files.rm(item.path).then(() => reload());
 		});
 }
 
@@ -105,6 +109,7 @@ function doClipboardAction (action) {
 	const items = listView.getSelectedItems(true);
 	if (items.length) Clipboard.save({ action, items });
 }
+
 
 function paste () {
 	if (fileNameEditMode) return;
@@ -153,7 +158,8 @@ function init () {
 	$.on(EVENT.filelist.paste, paste);
 	$.on(EVENT.filelist.delete, del);
 	$.on(EVENT.filelist.rename, rename);
-	$.on(EVENT.filelist.newfolder, newFolder);
+	$.on(EVENT.filelist.newfile, () => newItem('mkfile'));
+	$.on(EVENT.filelist.newfolder, () => newItem('mkdir'));
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
 	$.on(EVENT.filelist.select, listViewAction('selectItem'));
 	$.on(EVENT.filelist.selectall, listViewAction('selectAll'));

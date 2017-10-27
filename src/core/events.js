@@ -25,6 +25,7 @@ module.exports = {
 		rename: 'filelist-rename',
 
 		newfolder: 'filelist-new-folder',
+		newfile: 'filelist-new-file',
 		togglehidden: 'toggle-hidden',
 
 		select: 'filelist-select',
