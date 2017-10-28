@@ -1,7 +1,9 @@
 const {shell} = require('electron');
 const FS = require('fs-extra');
 const Path = require('path');
-const Copy = require('copy');
+// const Copy = require('copy');
+const Copy = require('recursive-copy');
+
 
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
@@ -127,15 +129,39 @@ function rm (path) {
 	return Promise.resolve(shell.moveItemToTrash(path));
 }
 
-function copy (items, path) {
-	const src = items.map(i => i.path);
-	return new Promise((resolve, reject) => {
-		Copy.each(src, path, (err, files) => {
-			if (err) return reject(err);
-			resolve(files);
-		});
-	});
+
+function _copy (op) {
+	return Copy(op.src, op.dest, { dot: true })
+		// .on(Copy.events.COPY_FILE_START, copyOp => {
+		// 	console.info('Copying file ' + copyOp.src + '...');
+		// })
+		// .on(Copy.events.COPY_FILE_COMPLETE, copyOp => {
+		// 	console.info('Copied to ', copyOp);
+		// })
+		.on(Copy.events.ERROR, err => (op.error = err.code))
+		.then(res => (op.res = res, op))
+		.catch(() => op);
 }
+
+
+// loop through files and do copy
+// - gather failed and loop again
+// - if EEXIST - ask to overwrite, rename or cancel
+
+
+function copy (items, path) {
+	const ops = items
+		.map(i => ({ src: i.path, dest: path }))
+		.map(_copy);
+
+
+	return Promise.all(ops)
+		.then(res => console.log(res));
+
+}
+
+
+
 
 function move (items, path) {
 	return Promise.resolve();

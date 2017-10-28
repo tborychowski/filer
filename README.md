@@ -6,6 +6,7 @@ A File Manager for the Keyboard People.
 # TODO
 
 - bookmarks bar - store history folders...
+	- cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
 	- command-palette
 - core: copy, cut & paste (visual & progress)
 	- use the real clipboard
@@ -15,14 +16,13 @@ A File Manager for the Keyboard People.
 - addon: open any app (sublime) here...
 - git: open repo here
 - core: regex filtering
-- core: bulk rename
+- core: bulk rename, delete
+- core: create nested folders (my/new/folder/path)
 - core: cache folders, and bg sync
 - core: settings (json?)
 - breadcrumbs: make it nicer and clickable?
-- cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
 - undo/redo (operation history)
-- statusbar: async folder size?
-- core: new file
+- core: show item stats (dates, sizes, ...)
 
 
 
