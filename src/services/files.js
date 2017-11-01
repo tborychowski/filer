@@ -32,7 +32,7 @@ const FILE_TYPES = {
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
 
 
-function ifNameValid (name) {
+function isNameValid (name) {
 	if (name === '.' || name === '..') return false;
 	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) return false;
 	return true;
@@ -151,7 +151,7 @@ function _copy (op) {
 
 function copy (items, path) {
 	const ops = items
-		.map(i => ({ src: i.path, dest: path }))
+		.map(i => ({ src: i.path, dest: Path.join(path, i.name) }))
 		.map(_copy);
 
 
@@ -168,7 +168,7 @@ function move (items, path) {
 }
 
 module.exports = {
-	ifNameValid,
+	isNameValid,
 	readDir,
 	rename,
 	mkdir,

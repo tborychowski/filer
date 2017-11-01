@@ -18,8 +18,11 @@ function Drops (target, config = { valueField: 'name' }) {
 		dblclick: [],
 		click: [],
 		change: [],				// any change to the view (select, filter, etc.)
+		openFile: [],
+		reload: [],
 	};
 	this.state = {
+		currentDir: this.config.homeDir,
 		focused: false,
 		rendered: false,
 		selectedIndex: 0,
@@ -100,8 +103,37 @@ Drops.prototype.initEvents = function () {
 	this.input.addEventListener('blur', this.onBlur.bind(this));
 	this.input.addEventListener('input', this.onInput.bind(this));
 	this.target.addEventListener('click', this.onClick.bind(this));
-	this.target.addEventListener('dblclick', e => this.triggerEvent(e));
+	this.target.addEventListener('dblclick', this.onDblClick.bind(this));
 	document.addEventListener('keydown', this.onKeydown.bind(this));
+};
+
+
+Drops.prototype.gotoDir = function (dir = this.config.homeDir, previousDir = false) {
+	if (dir === this.state.currentDir) return;
+	this.state.currentDir = dir;
+	return this.reload(previousDir);
+};
+
+Drops.prototype.goUp = function () {
+	if (this.state.locked) return this;
+	const ar = this.state.currentDir.split(this.config.pathSeparator);
+	const prev = ar.pop();
+	this.gotoDir(ar.join(this.config.pathSeparator), prev);
+};
+
+
+
+Drops.prototype.onDblClick = function (e) {
+	//this.triggerEvent(e);
+	if (this.state.locked) return;
+	const item = this.state.selectedItem = this.filteredData[this.state.selectedIndex];
+	if (item.isDir) {
+		if (item.name === '..') this.goUp();
+		else this.gotoDir(item.path);
+	}
+	else this.triggerEvent('openFile', item.path);
+
+
 };
 
 

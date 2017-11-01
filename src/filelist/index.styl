@@ -49,3 +49,54 @@
 	background-color #2E69E2
 	color #fff
 
+
+
+
+
+
+
+
+
+
+
+.filelist-wrapper
+	position absolute
+	left 0
+	right 0
+	top header-h
+	bottom footer-h
+	overflow-y auto
+
+.filelist
+	display flex
+	flex-flow column
+
+.filelist-item
+	padding 5px 10px
+	display flex
+	align-items center
+
+.filelist-item.selected
+	background-color #eee
+
+
+.filelist-item.highlighted
+	background-color #2E69E2
+	color #fff
+
+
+
+.filelist-input
+	font inherit
+	border none
+	border-radius 3px
+	padding 3px 10px
+	box-shadow 0 0 0 1px #ccc
+
+	&::placeholder
+		color #ccc
+		text-align center
+
+	&:focus
+		&::placeholder
+			color #fff
