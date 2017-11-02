@@ -21,7 +21,7 @@ function FilelistEdit (target, config = {}) {
 
 FilelistEdit.prototype.matchSize = function () {
 	const targetSize = this.target.getBoundingClientRect();
-	this.input.className = this.config.cls || 'overedit-input';
+	this.input.className = this.config.cls || 'filelist-edit-input';
 	this.input.style.position = 'absolute';
 	this.input.style.width = targetSize.width + 'px';
 	this.input.style.height = targetSize.height + 'px';
