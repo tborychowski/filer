@@ -40,14 +40,15 @@ const menuTemplate = [
 			option('Cut', 'CmdOrCtrl+X', EVENT.filelist.cut),
 			option('Copy', 'CmdOrCtrl+C', EVENT.filelist.copy),
 			option('Paste', 'CmdOrCtrl+V', EVENT.filelist.paste),
-			option('Delete', 'CmdOrCtrl+Backspace', EVENT.filelist.delete),
+			{ type: 'separator' },
 
+			option('Delete', 'CmdOrCtrl+Backspace', EVENT.filelist.delete),
 			option('Rename', 'CmdOrCtrl+Enter', EVENT.filelist.rename),
 			{ type: 'separator' },
 
 
-			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
 			option('New File', 'CmdOrCtrl+M', EVENT.filelist.newfile),
+			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
 			{ type: 'separator' },
 
 			option('Select', 'Space', EVENT.filelist.select),

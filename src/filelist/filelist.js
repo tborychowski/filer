@@ -186,7 +186,7 @@ FileList.prototype.onKeydown = function (e) {
 		return this.up();
 	}
 	if (this.state.mode === 'nav') {
-		if (e.key === ' ') return this.selectItem();
+		if (e.key === ' ') return;
 		if (e.key === 'ArrowLeft') return this.pageUp();
 		if (e.key === 'ArrowRight') return this.pageDown();
 		if (e.key === 'Backspace') {
@@ -318,6 +318,7 @@ FileList.prototype.getElFromIdx = function (idx = this.state.highlightedIndex) {
 
 
 FileList.prototype.selectItem = function () {
+	if (this.state.mode !== 'nav') return this;
 	const item = this.getHighlightedItem();
 	const el = this.getElFromIdx();
 	const selIdx = this.data.selected.indexOf(item);
