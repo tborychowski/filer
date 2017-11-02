@@ -4,7 +4,8 @@ const { Files, Clipboard } = require('../services');
 // const ListEdit = require('./list-edit');
 const FileList = require('./file-list');
 
-const sep = helper.pathSep;
+let flist;
+
 
 // function fileNameValidator (name) {
 // 	if (!Files.isNameValid(name)) return 'Incorrect name';
@@ -12,43 +13,8 @@ const sep = helper.pathSep;
 // 	return true;
 // }
 
-// function reload (dir) {
-// 	fileNameEditMode = false;
-// 	return listView.reload(dir).then(() => {
-// 		$.trigger(EVENT.dir.changed, currentDir);
-// 	});
-// }
-
-// function gotoDir (dir = helper.homeDir, previousDir = false) {
-// 	if (dir === currentDir) return;
-// 	currentDir = dir;
-// 	config.set('currentDir', dir);
-// 	reload(previousDir);
-// }
 
 
-// function goUp () {
-// 	if (fileNameEditMode) return;
-// 	const ar = currentDir.split(sep);
-// 	const prev = ar.pop();
-// 	gotoDir(ar.join(sep), prev);
-// }
-
-// function enterFolder (e, item) {
-// 	if (fileNameEditMode) return;
-// 	if (item.isDir) {
-// 		if (item.name === '..') goUp();
-// 		else gotoDir(item.path);
-// 	}
-// 	else helper.openFile(item.path);
-// }
-
-
-// function toggleHidden () {
-// 	if (fileNameEditMode) return;
-// 	config.set('showHidden', !config.get('showHidden'));
-// 	reload(listView.getSelectedItem().name);
-// }
 
 
 // function rename () {
@@ -68,14 +34,6 @@ const sep = helper.pathSep;
 // }
 
 
-// function getNextName (itemName = 'Folder') {
-// 	const items = listView.getItems().map(i => i.name).filter(i => i !== '..');
-// 	let i = 1, name = `New ${itemName}`;
-// 	while (items.includes(name)) name = `New ${itemName} (${i++})`;
-// 	return name;
-// }
-
-
 // function newItem (action = 'mkdir') {
 // 	if (fileNameEditMode) return;
 // 	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
@@ -90,17 +48,6 @@ const sep = helper.pathSep;
 // 		.on('cancel', () => reload());
 // }
 
-
-// function del () {
-// 	if (fileNameEditMode) return;
-// 	const item = listView.getSelectedItem();
-// 	if (item.name === '..') return;
-// 	dialog
-// 		.question({ message: `Delete "${item.name}"?` })
-// 		.then(res => {
-// 			if (res === 0) Files.rm(item.path).then(() => reload());
-// 		});
-// }
 
 
 // function doClipboardAction (action) {
@@ -125,38 +72,38 @@ const sep = helper.pathSep;
 
 
 
-// function listViewAction (action) {
-// 	return () => {
-// 		if (!fileNameEditMode && typeof listView[action] === 'function') listView[action]();
-// 	};
-// }
+function toggleHidden () {
+	config.set('showHidden', !config.get('showHidden'));
+	flist.load();
+}
+
+
+function del (item = flist.getSelectedItem()) {
+	if (item.name === '..') return;
+	dialog
+		.question({ message: `Delete "${item.name}"?` })
+		.then(res => {
+			if (res === 0) Files.rm(item.path).then(flist.load.bind(flist));
+		});
+}
 
 
 function init () {
-
-	FileList({
+	flist = FileList({
 		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),
-		homeDir: helper.homeDir,
-		pathSeparator: sep,
+		dir: config.get('currentDir') || helper.homeDir,
+		pathSeparator: helper.pathSep,
 	});
 
-	// listView = new ListView('.file-list', {
-	// 	dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),
-	// 	valueField: 'path',
-	// 	homeDir: helper.homeDir,
-	// 	pathSeparator: sep,
-	// 	searchInFields: ['name'],
-	// });
-
-	// listView.on('dblclick', enterFolder);
-
-	// listView.on('keydown', (e, item) => {
-	// 	if (e.key === 'Backspace') return goUp();
-	// 	if (e.key === 'Enter') return enterFolder(e, item);
-	// 	console.log('filelist:', e);
-	// });
-
-	// listView.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d)); // update statusbar
+	flist
+		.on('openFile', path => helper.openFile(path))
+		.on('change', () => $.trigger(EVENT.filelist.changed, flist))
+		.on('dirChange', path => {
+			config.set('currentDir', path);
+			$.trigger(EVENT.dir.changed, path);
+		})
+		.on('deleteItem', del)
+		.start();
 
 
 	// $.on(EVENT.filelist.undo, undo);
@@ -164,17 +111,15 @@ function init () {
 	// $.on(EVENT.filelist.cut, () => doClipboardAction('cut'));
 	// $.on(EVENT.filelist.copy, () => doClipboardAction('copy'));
 	// $.on(EVENT.filelist.paste, paste);
-	// $.on(EVENT.filelist.delete, del);
 	// $.on(EVENT.filelist.rename, rename);
 	// $.on(EVENT.filelist.newfile, () => newItem('mkfile'));
 	// $.on(EVENT.filelist.newfolder, () => newItem('mkdir'));
-	// $.on(EVENT.filelist.togglehidden, toggleHidden);
-	// $.on(EVENT.filelist.select, listViewAction('selectItem'));
-	// $.on(EVENT.filelist.selectall, listViewAction('selectAll'));
-	// $.on(EVENT.filelist.unselectall, listViewAction('unselectAll'));
-	// $.on(EVENT.search.start, listViewAction('onFocus'));
-
-	// gotoDir(config.get('currentDir'));
+	$.on(EVENT.filelist.delete, del);
+	$.on(EVENT.filelist.togglehidden, toggleHidden);
+	$.on(EVENT.filelist.select, () => flist.selectItem());
+	$.on(EVENT.filelist.selectall, () => flist.selectAll());
+	$.on(EVENT.filelist.unselectall, () => flist.unselectAll());
+	$.on(EVENT.search.start, () => flist.onFocus());
 }
 
 

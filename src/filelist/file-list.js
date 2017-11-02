@@ -5,7 +5,7 @@ function FileList (config = {}) {
 	if (!(this instanceof FileList)) return new FileList(config);
 	const defaults = {
 		pathSeparator: '/',
-		homeDir: './',
+		dir: './',
 		list: '.filelist',
 		input: '.filelist-input',
 		searchInFields: ['name'],
@@ -17,24 +17,27 @@ function FileList (config = {}) {
 	if (typeof this.config.dataSrc !== 'function') throw new Error('Data source missing!');
 
 
+	this.dataSrc = this.config.dataSrc;
 	this.data = {
 		original: [],
 		filtered: [],
 		selected: [],
 	};
-	this.dataSrc = this.config.dataSrc;
 	this.eventListeners = {
 		openFile: [],
 		loaded: [],
+		dirChange: [],
+		deleteItem: [],
+		change: [],							// anything: filtering, selection, copy, etc.
 	};
 	this.state = {
-		currentDir: this.config.homeDir,
+		currentDir: '',
 		previousDir: '',
-		mode: 'nav',				// nav || filter
+		mode: 'nav',						// nav || filter
 		highlightedIndex: 0,
 	};
 
-	return this.render().initEvents().load();
+	return this.render().initEvents();
 }
 
 
@@ -47,9 +50,9 @@ FileList.prototype.render = function () {
 };
 
 
-FileList.prototype.updateList = function () {
+FileList.prototype.updateList = function (highlightDir) {
 	this.list.innerHTML = this.getItemsHtml();
-	return this.highlight();
+	return this.highlight(highlightDir).triggerEvent('change');
 };
 
 
@@ -92,9 +95,9 @@ FileList.prototype.on = function (eventName, cb) {
 };
 
 
-FileList.prototype.triggerEvent = function (event) {
+FileList.prototype.triggerEvent = function (event, ...params) {
 	if (this.eventListeners[event]) {
-		const params = [this.getHighlightedItem(), this];
+		params = params.concat([this.getHighlightedItem(), this]);
 		this.eventListeners[event].forEach(cb => { cb.apply(cb, params); });
 	}
 	return this;
@@ -104,15 +107,22 @@ FileList.prototype.triggerEvent = function (event) {
 
 FileList.prototype.getHighlightedItem = function () {
 	const item = this.data.filtered[this.state.highlightedIndex];
-	item.el = this.getElFromIdx();
+	if (item) item.el = this.getElFromIdx();
 	return item;
 };
 
 
-FileList.prototype.gotoDir = function (dir = this.config.homeDir) {
+
+FileList.prototype.start = function () {
+	return this.gotoDir();
+};
+
+FileList.prototype.gotoDir = function (dir = this.config.dir) {
 	if (dir === this.state.currentDir) return;
 	this.state.currentDir = dir;
-	return this.load();
+	this.triggerEvent('dirChange', this.state.currentDir);
+	this.load();
+	return this;
 };
 
 
@@ -186,29 +196,41 @@ FileList.prototype.onKeydown = function (e) {
 
 	if (this.state.mode === 'nav') {
 		if (key === ' ') return this.selectItem();
-		if (key === 'backspace' && !hasMeta) return this.goUp();
 		if (key === 'arrowleft') return this.pageUp();
 		if (key === 'arrowright') return this.pageDown();
-		if (isAlpha(e) && !isNav) return this.input.focus();
+		if (key === 'backspace') {
+			if (e.metaKey) return this.triggerEvent('deleteItem');
+			return this.goUp();
+		}
+		if (key === 'enter' && e.metaKey) {
+			// TODO: trigger rename
+			console.log('rename');
+		}
+
+
+		if (isAlpha(e)) return this.input.focus();
 	}
 };
 
 
 
-FileList.prototype.load = function () {
+FileList.prototype.load = function (highlightDir) {
 	this.unselectAll();
 	this.input.value = '';
 	this.input.blur();
-	let highlightDir = '..';
-	if (this.state.previousDir) highlightDir = this.state.previousDir;
+	if (this.state.previousDir) {
+		highlightDir = this.state.previousDir;
+		this.state.previousDir = null;
+	}
 	if (!highlightDir && this.data.filtered.length && this.state.highlightedIndex > 0) {
-		highlightDir = this.getItemByIdx(this.state.highlightedIndex).name;
+		highlightDir = this.getHighlightedItem().name;
+		if (!highlightDir) highlightDir = this.getItemByIdx(this.state.highlightedIndex).name;
 	}
 	return this.dataSrc(this.state.currentDir)
 		.then(data => {
 			this.data.original = data;
 			this.data.filtered = Array.from(data);
-			return this.updateList().highlight(highlightDir);
+			return this.updateList(highlightDir);
 		});
 };
 
@@ -223,7 +245,10 @@ FileList.prototype.clear = function () {
 
 FileList.prototype.filterFunction = function (q, item) {
 	if (!this.config.searchInFields || !this.config.searchInFields.length) return false;
-	const reg = new RegExp(q.replace(/\s/g, '.*'), 'ig');
+	let reg;
+	try { reg = new RegExp(q.replace(/\s/g, '.*'), 'ig'); }
+	catch (e) { reg = /.*/ig; }
+
 	for (let field of this.config.searchInFields) {
 		if (reg.test(item[field])) return true;
 	}
@@ -234,7 +259,9 @@ FileList.prototype.filterFunction = function (q, item) {
 // 'item number one'.replace(/(it)(.*)(nu)(.*)(one)/ig, '<b>$1</b>$2 <b>$3</b>$4 <b>$5</b>')
 FileList.prototype.highlightFilter = function (q) {
 	const qs = '(' + q.trim().replace(/\s/g, ')(.*)(') + ')';
-	const reg = new RegExp(qs, 'ig');
+	let reg;
+	try { reg = new RegExp(qs, 'ig'); }
+	catch (e) { reg = /(.*)/ig; }
 
 	let n = 1, len = qs.split(')(').length + 1, repl = '';
 	for (; n < len; n++) repl += n % 2 ? `<b>$${n}</b>` : `$${n}`;
@@ -259,7 +286,7 @@ FileList.prototype.filter = function () {
 	if (!q) this.data.filtered = Array.from(this.data.original);
 	else {
 		const hlfilter = this.highlightFilter(q);
-		this.data.filtered = this.data
+		this.data.filtered = this.data.original
 			.filter(this.filterFunction.bind(this, q))
 			.map(hlfilter);
 	}
@@ -324,13 +351,14 @@ FileList.prototype.selectItem = function () {
 
 
 FileList.prototype.selectAll = function () {
-	this.selectedItems = Array.from(this.data.filtered);
+	this.data.selected = Array.from(this.data.filtered);
 	this.list.querySelectorAll('.filelist-item.selectable')
 		.forEach(el => el.classList.add('selected'));
 	return this.triggerEvent('change');
 };
 
 FileList.prototype.unselectAll = function () {
+	if (!this.data.selected.length) return this;
 	this.data.selected = [];
 	this.list.querySelectorAll('.filelist-item.selected')
 		.forEach(el => el.classList.remove('selected'));
@@ -362,11 +390,25 @@ FileList.prototype.getFilteredItems = function () {
 	return this.data.filtered.filter(i => i.name !== '..');
 };
 
+FileList.prototype.getSelectedItems = function () {
+	return this.data.selected;
+};
+
 
 FileList.prototype.getItemByIdx = function (idx) {
 	if (idx >= this.data.filtered.length) idx = this.data.filtered.length - 1;
 	if (idx < 0) idx = 0;
 	return this.data.filtered[idx];
+};
+
+
+
+
+FileList.prototype.getNextName = function (itemName = 'Folder') {
+	const items = this.getItems().map(i => i.name);
+	let i = 1, name = `New ${itemName}`;
+	while (items.includes(name)) name = `New ${itemName} (${i++})`;
+	return name;
 };
 
 
@@ -376,6 +418,26 @@ FileList.prototype.injectEmptyRowAfter = function (name = 'new item') {
 	el.insertAdjacentHTML('afterend', this.getItemHtml({name}));
 	return el.nextElementSibling;
 };
+
+
+
+
+
+FileList.prototype.newItem = function (action = 'mkdir') {
+// 	if (fileNameEditMode) return;
+// 	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
+// 	const el = listView.injectEmptyRowAfter(name);
+// 	fileNameEditMode = name;
+// 	listView.lock();
+
+// 	ListEdit(el, { value: name, validator: fileNameValidator })
+// 		.on('save', newName => {
+// 			Files[action](currentDir, newName).then(() => reload(newName));
+// 		})
+// 		.on('cancel', () => reload());
+}
+
+
 
 
 if (typeof module === 'object') module.exports = FileList;
