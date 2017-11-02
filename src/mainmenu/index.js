@@ -52,7 +52,7 @@ const menuTemplate = [
 
 			option('Select', 'Space', EVENT.filelist.select),
 			option('Select All', 'CmdOrCtrl+A', EVENT.filelist.selectall),
-			option('Deselect All', 'CmdOrCtrl+Shift+A', EVENT.filelist.unselectall),
+			option('Unselect All', 'CmdOrCtrl+Shift+A', EVENT.filelist.unselectall),
 			{ type: 'separator' },
 
 			option('Find', 'CmdOrCtrl+F', EVENT.search.start),

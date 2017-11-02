@@ -66,7 +66,6 @@ function render () {
 function updateGitStatus () {
 	state.gitStatus = null;
 	Git.status(state.dir).then(status => {
-		if (!status) return;
 		state.git = status;
 		render();
 	});
@@ -82,12 +81,12 @@ function updateState (updates) {
 
 
 
-function onListChanged (drops) {
-	if (!drops || !drops.getItems().length) return;
+function onListChanged (flist) {
+	if (!flist || !flist.getItems().length) return;
 	const items = {
-		all: drops.getItems().length,
-		filtered: drops.getFilteredItems().length,
-		selected: drops.getSelectedItems().length,
+		all: flist.getItems().length,
+		filtered: flist.getFilteredItems().length,
+		selected: flist.getSelectedItems().length,
 	};
 	updateState({ items });
 }
@@ -105,7 +104,7 @@ function init () {
 	el = $('.footer-stats');
 
 	$.on(EVENT.filelist.changed, onListChanged);
-	$.on(EVENT.dir.changed, onDirChanged);
+	$.on(EVENT.dir.changed, onDirChanged);					// update git status
 	$.on(EVENT.clipboard.changed, onClipboardChanged);
 }
 

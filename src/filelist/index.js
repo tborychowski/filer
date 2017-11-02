@@ -1,172 +1,100 @@
 const { $, EVENT, helper, dialog, config } = require('../core');
 const { Files, Clipboard } = require('../services');
-const ListView = require('./list-view');
-const ListEdit = require('./list-edit');
+const FileList = require('./filelist');
 
-const sep = helper.pathSep;
-let listView, currentDir;
-let fileNameEditMode = false;
-
-function fileNameValidator (name) {
-	if (!Files.ifNameValid(name)) return 'Incorrect name';
-	if (listView.getItems().map(i => i.name).includes(name)) return 'Name already exists';
-	return true;
-}
-
-function reload (dir) {
-	fileNameEditMode = false;
-	return listView.reload(dir).then(() => {
-		$.trigger(EVENT.dir.changed, currentDir);
-	});
-}
-
-function gotoDir (dir = helper.homeDir, previousDir = false) {
-	if (dir === currentDir) return;
-	currentDir = dir;
-	config.set('currentDir', dir);
-	reload(previousDir);
-}
+let flist;
 
 
-function goUp () {
-	if (fileNameEditMode) return;
-	const ar = currentDir.split(sep);
-	const prev = ar.pop();
-	gotoDir(ar.join(sep), prev);
-}
+// function doClipboardAction (action) {
+// 	if (fileNameEditMode) return;
+// 	const items = listView.getSelectedItems(true);
+// 	if (items.length) Clipboard.save({ action, items });
+// }
 
-function enterFolder (e, item) {
-	if (fileNameEditMode) return;
-	if (item.isDir) {
-		if (item.name === '..') goUp();
-		else gotoDir(item.path);
-	}
-	else helper.openFile(item.path);
-}
+
+// function paste () {
+// 	if (fileNameEditMode) return;
+// 	const clip = Clipboard.get();
+// 	const action = (clip.action === 'cut') ? 'move' : clip.action;
+
+// 	if (typeof Files[action] !== 'function') return console.log('Unknown action:', action);
+
+// 	Files[action](clip.items, currentDir).then(() => {
+// 		Clipboard.clear();
+// 		reload(listView.getSelectedItem().name);
+// 	});
+// }
+
 
 
 function toggleHidden () {
-	if (fileNameEditMode) return;
 	config.set('showHidden', !config.get('showHidden'));
-	reload(listView.getSelectedItem().name);
+	flist.load();
 }
 
 
-function rename () {
-	if (fileNameEditMode) return;
-	const item = listView.getSelectedItem();
-	if (item.name === '..') return;
-	fileNameEditMode = item.name;
-	listView.lock();
-	ListEdit(item.el, { value: item.name, validator: fileNameValidator })
-		.on('save', newName => {
-			listView.unlock();
-			Files
-				.rename(item, newName)
-				.then(() => reload(newName));
-		})
-		.on('done', () => { fileNameEditMode = false; });
+function newItem (type, newName) {
+	const action = type === 'folder' ? 'mkdir' : 'mkfile';
+	const currentDir = flist.getCurrentDir();
+	Files[action](currentDir, newName).then(() => flist.load(newName));
+}
+
+function rename (newName, item) {
+	Files.rename(item, newName).then(() => flist.load(newName));
 }
 
 
-function getNextName (itemName = 'Folder') {
-	const items = listView.getItems().map(i => i.name).filter(i => i !== '..');
-	let i = 1, name = `New ${itemName}`;
-	while (items.includes(name)) name = `New ${itemName} (${i++})`;
-	return name;
+// highlight item with the same index after delete
+function reloadAfterDelete () {
+	const idx = flist.getHighlightedIndex();
+	flist.load().then(() => {
+		const item = flist.getItemByIdx(idx);
+		flist.highlight(item.name);
+	});
 }
 
-
-function newItem (action = 'mkdir') {
-	if (fileNameEditMode) return;
-	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
-	const el = listView.injectEmptyRowAfter(name);
-	fileNameEditMode = name;
-	listView.lock();
-
-	ListEdit(el, { value: name, validator: fileNameValidator })
-		.on('save', newName => {
-			Files[action](currentDir, newName).then(() => reload(newName));
-		})
-		.on('cancel', () => reload());
-}
-
-
-function del () {
-	if (fileNameEditMode) return;
-	const item = listView.getSelectedItem();
+function del (item = flist.getHighlightedItem()) {
 	if (item.name === '..') return;
 	dialog
 		.question({ message: `Delete "${item.name}"?` })
 		.then(res => {
-			if (res === 0) Files.rm(item.path).then(() => reload());
+			if (res === 0) Files.rm(item.path).then(reloadAfterDelete);
 		});
 }
 
 
-function doClipboardAction (action) {
-	if (fileNameEditMode) return;
-	const items = listView.getSelectedItems(true);
-	if (items.length) Clipboard.save({ action, items });
-}
-
-
-function paste () {
-	if (fileNameEditMode) return;
-	const clip = Clipboard.get();
-	const action = (clip.action === 'cut') ? 'move' : clip.action;
-
-	if (typeof Files[action] !== 'function') return console.log('Unknown action:', action);
-
-	Files[action](clip.items, currentDir).then(() => {
-		Clipboard.clear();
-		reload(listView.getSelectedItem().name);
-	});
-}
-
-
-
-function listViewAction (action) {
-	return () => {
-		if (!fileNameEditMode && typeof listView[action] === 'function') listView[action]();
-	};
-}
-
-
 function init () {
-	listView = new ListView('.file-list', {
-		dataSrc: () => Files.readDir(currentDir, { showHidden: config.get('showHidden') }),
-		valueField: 'path',
-		searchInFields: ['name'],
-	});
-
-	listView.on('dblclick', enterFolder);
-
-	listView.on('keydown', (e, item) => {
-		if (e.key === 'Backspace') return goUp();
-		if (e.key === 'Enter') return enterFolder(e, item);
-		console.log('filelist:', e);
-	});
-
-	listView.on('change', (e, d) => $.trigger(EVENT.filelist.changed, d)); // update statusbar
+	flist = FileList({
+		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),
+		dir: config.get('currentDir') || helper.homeDir,
+		pathSeparator: helper.pathSep,
+	})
+		.on('openFile', path => helper.openFile(path))
+		.on('change', () => $.trigger(EVENT.filelist.changed, flist))
+		.on('dirChange', path => {
+			config.set('currentDir', path);
+			$.trigger(EVENT.dir.changed, path);
+		})
+		.on('deleteItem', del)
+		.on('newItem', newItem)
+		.on('rename', rename)
+		.start();
 
 
 	// $.on(EVENT.filelist.undo, undo);
 	// $.on(EVENT.filelist.redo, redo);
-	$.on(EVENT.filelist.cut, () => doClipboardAction('cut'));
-	$.on(EVENT.filelist.copy, () => doClipboardAction('copy'));
-	$.on(EVENT.filelist.paste, paste);
+	// $.on(EVENT.filelist.cut, () => doClipboardAction('cut'));
+	// $.on(EVENT.filelist.copy, () => doClipboardAction('copy'));
+	// $.on(EVENT.filelist.paste, paste);
+	$.on(EVENT.filelist.rename, () => flist.rename());
+	$.on(EVENT.filelist.newfile, () => flist.newItem('file'));
+	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
 	$.on(EVENT.filelist.delete, del);
-	$.on(EVENT.filelist.rename, rename);
-	$.on(EVENT.filelist.newfile, () => newItem('mkfile'));
-	$.on(EVENT.filelist.newfolder, () => newItem('mkdir'));
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
-	$.on(EVENT.filelist.select, listViewAction('selectItem'));
-	$.on(EVENT.filelist.selectall, listViewAction('selectAll'));
-	$.on(EVENT.filelist.unselectall, listViewAction('unselectAll'));
-	$.on(EVENT.search.start, listViewAction('onFocus'));
-
-	gotoDir(config.get('currentDir'));
+	$.on(EVENT.filelist.select, () => flist.selectItem());
+	$.on(EVENT.filelist.selectall, () => flist.selectAll());
+	$.on(EVENT.filelist.unselectall, () => flist.unselectAll());
+	$.on(EVENT.search.start, () => flist.onFocus());
 }
 
 

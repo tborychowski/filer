@@ -15,7 +15,6 @@ A File Manager for the Keyboard People.
 - addon: open finder here
 - addon: open any app (sublime) here...
 - git: open repo here
-- core: regex filtering
 - core: bulk rename, delete
 - core: create nested folders (my/new/folder/path)
 - core: cache folders, and bg sync

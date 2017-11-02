@@ -1,5 +1,5 @@
-function Overedit (target, config = {}) {
-	if (!(this instanceof Overedit)) return new Overedit(target, config);
+function FilelistEdit (target, config = {}) {
+	if (!(this instanceof FilelistEdit)) return new FilelistEdit(target, config);
 	if (typeof target === 'string') target = document.querySelector(target);
 	if (!target) throw new Error('Target does not exist!');
 
@@ -19,9 +19,9 @@ function Overedit (target, config = {}) {
 }
 
 
-Overedit.prototype.matchSize = function () {
+FilelistEdit.prototype.matchSize = function () {
 	const targetSize = this.target.getBoundingClientRect();
-	this.input.className = this.config.cls || 'overedit-input';
+	this.input.className = this.config.cls || 'filelist-edit-input';
 	this.input.style.position = 'absolute';
 	this.input.style.width = targetSize.width + 'px';
 	this.input.style.height = targetSize.height + 'px';
@@ -30,13 +30,13 @@ Overedit.prototype.matchSize = function () {
 };
 
 
-Overedit.prototype.initEvents = function () {
+FilelistEdit.prototype.initEvents = function () {
 	this.input.addEventListener('keydown', this.onKeyDown.bind(this));
 	this.input.addEventListener('blur', this.save.bind(this));
 };
 
 
-Overedit.prototype.render = function () {
+FilelistEdit.prototype.render = function () {
 	this.input = document.createElement('input');
 	this.input.value = this.value;
 	this.matchSize();
@@ -47,7 +47,7 @@ Overedit.prototype.render = function () {
 };
 
 
-Overedit.prototype.destroy = function () {
+FilelistEdit.prototype.destroy = function () {
 	this.input.remove();
 	this.state.rendered = false;
 	this.triggerEvent('done');
@@ -55,18 +55,18 @@ Overedit.prototype.destroy = function () {
 };
 
 
-Overedit.prototype.cancel = function () {
+FilelistEdit.prototype.cancel = function () {
 	if (!this.state.rendered) return this;
 	this.state.rendered = false;		// chrome triggers blur and keydown in the same time
 	this.triggerEvent('cancel');
 	return this.destroy();
 };
 
-Overedit.prototype.save = function () {
+FilelistEdit.prototype.save = function () {
 	if (!this.state.rendered) return this;
 	let name = this.input.value;
 	if (typeof this.config.validator === 'function') {
-		if (this.config.validator(name) !== true) {
+		if (this.config.validator(name) !== true && name !== this.value) {
 			this.input.select();
 			return this;
 		}
@@ -79,13 +79,13 @@ Overedit.prototype.save = function () {
 
 
 // fake cut, copy & paste
-Overedit.prototype.fakeEvent = function (name) {
+FilelistEdit.prototype.fakeEvent = function (name) {
 	try { document.execCommand(name); }
 	catch (e) { console.log('Error with ' + name); }
 };
 
 
-Overedit.prototype.onKeyDown = function (e) {
+FilelistEdit.prototype.onKeyDown = function (e) {
 	e.stopPropagation();
 
 	if (e.metaKey) {
@@ -105,14 +105,14 @@ Overedit.prototype.onKeyDown = function (e) {
 };
 
 
-Overedit.prototype.triggerEvent = function (eventName, ...params) {
+FilelistEdit.prototype.triggerEvent = function (eventName, ...params) {
 	if (!this.eventListeners[eventName]) return this;
 	this.eventListeners[eventName].forEach(cb => { cb.apply(cb, params); });
 	return this;
 };
 
 
-Overedit.prototype.on = function (eventName, cb) {
+FilelistEdit.prototype.on = function (eventName, cb) {
 	if (!this.eventListeners[eventName]) throw new Error(`Event doesnt exist: ${eventName}`);
 	this.eventListeners[eventName].push(cb);
 	return this;
@@ -120,4 +120,4 @@ Overedit.prototype.on = function (eventName, cb) {
 
 
 
-if (typeof module === 'object') module.exports = Overedit;
+if (typeof module === 'object') module.exports = FilelistEdit;
