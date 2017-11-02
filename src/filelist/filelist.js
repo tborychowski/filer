@@ -1,3 +1,5 @@
+const ListEdit = require('./filelist-edit');
+
 const isAlpha = e => (e.keyCode >= 65 && e.keyCode <= 90 && !e.ctrlKey && !e.metaKey);
 
 
@@ -29,6 +31,8 @@ function FileList (config = {}) {
 		dirChange: [],
 		deleteItem: [],
 		change: [],							// anything: filtering, selection, copy, etc.
+		newItem: [],
+		rename: [],
 	};
 	this.state = {
 		currentDir: '',
@@ -104,15 +108,6 @@ FileList.prototype.triggerEvent = function (event, ...params) {
 };
 
 
-
-FileList.prototype.getHighlightedItem = function () {
-	const item = this.data.filtered[this.state.highlightedIndex];
-	if (item) item.el = this.getElFromIdx();
-	return item;
-};
-
-
-
 FileList.prototype.start = function () {
 	return this.gotoDir();
 };
@@ -172,42 +167,32 @@ FileList.prototype.onClick = function (e) {
 
 
 FileList.prototype.onKeydown = function (e) {
-	const hasMeta = e.metaKey || e.altKey || e.ctrlKey || e.shiftKey;
-	const isNav = this.state.mode === 'nav';
-	let key = e.key.toLowerCase();
-
-	if (key === 'escape') {
+	if (e.key === 'Escape') {
 		this.state.highlightedIndex = 0;
 		this.input.blur();
 		return this.highlight().clear();
 	}
-	if (key === 'enter' && !hasMeta) {
+	if (e.key === 'Enter') {
 		this.input.blur();
+		if (e.metaKey) return this.rename();
 		return this.openItem();
 	}
-	if (key === 'arrowdown') {
+	if (e.key === 'ArrowDown') {
 		this.input.blur();
 		return this.down();
 	}
-	if (key === 'arrowup') {
+	if (e.key === 'ArrowUp') {
 		this.input.blur();
 		return this.up();
 	}
-
 	if (this.state.mode === 'nav') {
-		if (key === ' ') return this.selectItem();
-		if (key === 'arrowleft') return this.pageUp();
-		if (key === 'arrowright') return this.pageDown();
-		if (key === 'backspace') {
+		if (e.key === ' ') return this.selectItem();
+		if (e.key === 'ArrowLeft') return this.pageUp();
+		if (e.key === 'ArrowRight') return this.pageDown();
+		if (e.key === 'Backspace') {
 			if (e.metaKey) return this.triggerEvent('deleteItem');
 			return this.goUp();
 		}
-		if (key === 'enter' && e.metaKey) {
-			// TODO: trigger rename
-			console.log('rename');
-		}
-
-
 		if (isAlpha(e)) return this.input.focus();
 	}
 };
@@ -382,6 +367,21 @@ FileList.prototype.highlight = function (name) {
 };
 
 
+FileList.prototype.getCurrentDir = function () {
+	return this.state.currentDir;
+};
+
+FileList.prototype.getHighlightedIndex = function () {
+	return this.state.highlightedIndex;
+};
+
+FileList.prototype.getHighlightedItem = function () {
+	const item = this.data.filtered[this.state.highlightedIndex];
+	if (item) item.el = this.getElFromIdx();
+	return item;
+};
+
+
 FileList.prototype.getItems = function () {
 	return this.data.original.filter(i => i.name !== '..');
 };
@@ -420,23 +420,43 @@ FileList.prototype.injectEmptyRowAfter = function (name = 'new item') {
 };
 
 
+FileList.prototype.fileNameValidator = function (name) {
+	if (name === '.' || name === '..') return 'Incorrect name';
+	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) return 'Incorrect name';
+	if (this.getItems().map(i => i.name).includes(name)) return 'Name already exists';
+	return true;
+};
 
 
+FileList.prototype.newItem = function (type = 'folder') {
+	if (this.state.mode === 'name-edit') return this;
+	const name = this.getNextName(type === 'folder' ? 'Folder' : 'File');
+	const el = this.injectEmptyRowAfter(name);
+	this.state.mode = 'name-edit';
+	ListEdit(el, { value: name, validator: this.fileNameValidator.bind(this) })
+		.on('save', newName => {
+			this.triggerEvent('newItem', type, newName);
+		})
+		.on('done', () => {
+			this.state.mode = 'nav';
+			el.remove();
+		});
+};
 
-FileList.prototype.newItem = function (action = 'mkdir') {
-// 	if (fileNameEditMode) return;
-// 	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
-// 	const el = listView.injectEmptyRowAfter(name);
-// 	fileNameEditMode = name;
-// 	listView.lock();
 
-// 	ListEdit(el, { value: name, validator: fileNameValidator })
-// 		.on('save', newName => {
-// 			Files[action](currentDir, newName).then(() => reload(newName));
-// 		})
-// 		.on('cancel', () => reload());
-}
-
+FileList.prototype.rename = function () {
+	if (this.state.mode === 'name-edit') return this;
+	const item = this.getHighlightedItem();
+	if (item.name === '..') return;
+	this.state.mode = 'name-edit';
+	ListEdit(item.el, { value: item.name, validator: this.fileNameValidator.bind(this) })
+		.on('save', newName => {
+			this.triggerEvent('rename', newName);
+		})
+		.on('done', () => {
+			this.state.mode = 'nav';
+		});
+};
 
 
 

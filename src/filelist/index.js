@@ -1,53 +1,8 @@
 const { $, EVENT, helper, dialog, config } = require('../core');
 const { Files, Clipboard } = require('../services');
-// const ListView = require('./list-view');
-// const ListEdit = require('./list-edit');
-const FileList = require('./file-list');
+const FileList = require('./filelist');
 
 let flist;
-
-
-// function fileNameValidator (name) {
-// 	if (!Files.isNameValid(name)) return 'Incorrect name';
-// 	if (listView.getItems().map(i => i.name).includes(name)) return 'Name already exists';
-// 	return true;
-// }
-
-
-
-
-
-// function rename () {
-// 	if (fileNameEditMode) return;
-// 	const item = listView.getSelectedItem();
-// 	if (item.name === '..') return;
-// 	fileNameEditMode = item.name;
-// 	listView.lock();
-// 	ListEdit(item.el, { value: item.name, validator: fileNameValidator })
-// 		.on('save', newName => {
-// 			listView.unlock();
-// 			Files
-// 				.rename(item, newName)
-// 				.then(() => reload(newName));
-// 		})
-// 		.on('done', () => { fileNameEditMode = false; });
-// }
-
-
-// function newItem (action = 'mkdir') {
-// 	if (fileNameEditMode) return;
-// 	const name = getNextName(action === 'mkdir' ? 'Folder' : 'File');
-// 	const el = listView.injectEmptyRowAfter(name);
-// 	fileNameEditMode = name;
-// 	listView.lock();
-
-// 	ListEdit(el, { value: name, validator: fileNameValidator })
-// 		.on('save', newName => {
-// 			Files[action](currentDir, newName).then(() => reload(newName));
-// 		})
-// 		.on('cancel', () => reload());
-// }
-
 
 
 // function doClipboardAction (action) {
@@ -78,12 +33,32 @@ function toggleHidden () {
 }
 
 
-function del (item = flist.getSelectedItem()) {
+function newItem (type, newName) {
+	const action = type === 'folder' ? 'mkdir' : 'mkfile';
+	const currentDir = flist.getCurrentDir();
+	Files[action](currentDir, newName).then(() => flist.load(newName));
+}
+
+function rename (newName, item) {
+	Files.rename(item, newName).then(() => flist.load(newName));
+}
+
+
+// highlight item with the same index after delete
+function reloadAfterDelete () {
+	const idx = flist.getHighlightedIndex();
+	flist.load().then(() => {
+		const item = flist.getItemByIdx(idx);
+		flist.highlight(item.name);
+	});
+}
+
+function del (item = flist.getHighlightedItem()) {
 	if (item.name === '..') return;
 	dialog
 		.question({ message: `Delete "${item.name}"?` })
 		.then(res => {
-			if (res === 0) Files.rm(item.path).then(flist.load.bind(flist));
+			if (res === 0) Files.rm(item.path).then(reloadAfterDelete);
 		});
 }
 
@@ -93,9 +68,7 @@ function init () {
 		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),
 		dir: config.get('currentDir') || helper.homeDir,
 		pathSeparator: helper.pathSep,
-	});
-
-	flist
+	})
 		.on('openFile', path => helper.openFile(path))
 		.on('change', () => $.trigger(EVENT.filelist.changed, flist))
 		.on('dirChange', path => {
@@ -103,6 +76,8 @@ function init () {
 			$.trigger(EVENT.dir.changed, path);
 		})
 		.on('deleteItem', del)
+		.on('newItem', newItem)
+		.on('rename', rename)
 		.start();
 
 
@@ -111,9 +86,9 @@ function init () {
 	// $.on(EVENT.filelist.cut, () => doClipboardAction('cut'));
 	// $.on(EVENT.filelist.copy, () => doClipboardAction('copy'));
 	// $.on(EVENT.filelist.paste, paste);
-	// $.on(EVENT.filelist.rename, rename);
-	// $.on(EVENT.filelist.newfile, () => newItem('mkfile'));
-	// $.on(EVENT.filelist.newfolder, () => newItem('mkdir'));
+	$.on(EVENT.filelist.rename, () => flist.rename());
+	$.on(EVENT.filelist.newfile, () => flist.newItem('file'));
+	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
 	$.on(EVENT.filelist.delete, del);
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
 	$.on(EVENT.filelist.select, () => flist.selectItem());

@@ -32,12 +32,6 @@ const FILE_TYPES = {
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
 
 
-function isNameValid (name) {
-	if (name === '.' || name === '..') return false;
-	if (/^[0-9a-zA-Z. ()'"!@€£$#%^&*-]+$/.test(name) === false) return false;
-	return true;
-}
-
 function findFileIcon (ext = '') {
 	ext = ext.toLowerCase().substr(1);
 	for (let t in FILE_TYPES) if (ext in FILE_TYPES[t]) return `file-${t}-o`;
@@ -168,7 +162,6 @@ function move (items, path) {
 }
 
 module.exports = {
-	isNameValid,
 	readDir,
 	rename,
 	mkdir,
