@@ -7,6 +7,7 @@
 	top header-h
 	bottom footer-h
 	overflow-y auto
+	padding 2px 0
 
 .filelist
 	display flex
@@ -20,6 +21,9 @@
 .filelist-item.selected
 	background-color #eee
 
+	i::before
+		content "\f00c"
+		color #95c095
 
 .filelist-item.highlighted
 	background-color #2E69E2

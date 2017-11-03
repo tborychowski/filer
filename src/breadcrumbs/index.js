@@ -1,9 +1,11 @@
-const { $, EVENT } = require('../core');
+const { $, EVENT, helper } = require('../core');
 
+const home = helper.homeDir;
 let el;
 
 
 function onDirChanged (path) {
+	path = path.replace(home, '~');
 	el.html(path);
 }
 

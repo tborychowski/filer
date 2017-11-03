@@ -3,6 +3,7 @@ const { Git } = require('../services');
 const _isEqual = require('lodash.isequal');
 
 
+const separator = '<div class="footer-filler"></div>';
 let el;
 let state = {
 	items: null,
@@ -58,6 +59,7 @@ function render () {
 		getFilteredHtml() +
 		getSelectedHtml() +
 		getCopiedHtml() +
+		separator +
 		getGitHtml());
 }
 
