@@ -9,8 +9,6 @@ A File Manager for the Keyboard People.
 	- cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
 	- command-palette
 - core: copy, cut & paste (visual & progress)
-	- use the real clipboard
-	https://github.com/electron/electron/issues/2244
 - addon: open terminal here
 - addon: open finder here
 - addon: open any app (sublime) here...

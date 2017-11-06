@@ -1,7 +1,7 @@
 const {shell} = require('electron');
 const FS = require('fs-extra');
 const Path = require('path');
-// const Copy = require('copy');
+const PrettyBytes = require('pretty-bytes');
 const Copy = require('recursive-copy');
 const FileExtMap = require('./file-ext-map.js');
 
@@ -49,9 +49,11 @@ function getFileDetails (parentPath, name) {
 	const isDir = stats.isDirectory();
 	const type = isDir ? 'folder' : isFile ? 'file' : '';
 	const isHidden = dotRegEx.test(name);
-	const ext = Path.extname(name);
-	const cls = getIconCls(type, ext);
-	return { name, path, parentPath, type, isDir, isFile, ext, cls, isHidden };
+	const ext = isFile ? Path.extname(name) : '';
+	const basename = Path.basename(name, ext);
+	const iconClass = getIconCls(type, ext);
+	const size = isFile ? PrettyBytes(stats.size) : '';
+	return { name, basename, path, parentPath, type, isDir, isFile, ext, iconClass, isHidden, size };
 }
 
 
@@ -68,6 +70,8 @@ function addFolderUp (parentPath, fileList) {
 	if (parentPath !== sep) {
 		fileList.unshift({
 			name: '..',
+			basename: '..',
+			ext: '',
 			path: dropLastSegment(parentPath),
 			parentPath,
 			isHidden: false,

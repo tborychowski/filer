@@ -10,7 +10,7 @@ function FileList (config = {}) {
 		dir: './',
 		list: '.filelist',
 		input: '.filelist-input',
-		searchInFields: ['name'],
+		searchInFields: ['basename', 'ext'],
 		valueField: 'path'
 	};
 	this.config = Object.assign({}, defaults, config);
@@ -64,14 +64,21 @@ FileList.prototype.getItemsHtml = function () {
 	return this.data.filtered.map(this.getItemHtml.bind(this)).join('');
 };
 
+
 FileList.prototype.getItemHtml = function (i) {
 	if (!i) return '';
 	let id = i[this.config.valueField] || '';
 	let cls = ['filelist-item'];
 	cls.push(i.name === '..' ? 'unselectable' : 'selectable');
-	const name = `<i class="file-icon ${i.cls}"></i>
-		<span class="file-name">${i.highlighted ? i.highlighted.name : i.name}</span>`;
-	return `<div class="${cls.join(' ')}" data-id="${id}">${name}</div>`;
+	const name = i.highlighted ? i.highlighted.basename : i.basename;
+	const ext = i.highlighted ? i.highlighted.ext : i.ext;
+	const size = i.size ? `${i.size}`: '';
+	return `<div class="${cls.join(' ')}" data-id="${id}">
+			<i class="file-icon ${i.iconClass}"></i>
+			<span class="file-name">${name}</span>
+			<span class="file-ext">${ext}</span>
+			<span class="file-size">${size}</span>
+		</div>`;
 };
 
 
