@@ -1,6 +1,5 @@
 const ListEdit = require('./filelist-edit');
-
-const isAlpha = e => (e.keyCode >= 65 && e.keyCode <= 90 && !e.ctrlKey && !e.metaKey);
+const { $ } = require('../core');
 
 
 function FileList (config = {}) {
@@ -76,7 +75,7 @@ FileList.prototype.getItemHtml = function (i) {
 	return `<div class="${cls.join(' ')}" data-id="${id}">
 			<i class="file-icon ${i.iconClass}"></i>
 			<span class="file-name">${name}</span>
-			<span class="file-ext">${ext}</span>
+			<span class="file-ext">${ext || ''}</span>
 			<span class="file-size">${size}</span>
 		</div>`;
 };
@@ -200,7 +199,7 @@ FileList.prototype.onKeydown = function (e) {
 			if (e.metaKey) return this.triggerEvent('deleteItem');
 			return this.goUp();
 		}
-		if (isAlpha(e)) return this.input.focus();
+		if ($.isAlphaNumeric(e)) return this.input.focus();
 	}
 };
 
