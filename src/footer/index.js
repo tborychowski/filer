@@ -30,16 +30,10 @@ function getSelectedHtml () {
 }
 
 function getCopiedHtml () {
-	if (!state.clip || !state.clip.items) return '';
-	const len = state.clip.items && state.clip.items.length;
-	const types = {
-		copy: { cls: 'files-o', title: 'Copied' },
-		cut: { cls: 'scissors', title: 'Cut' },
-	};
-	const type = types[state.clip.action] || types.copy;
-
-	return `<div class="footer-stats-item" title="${type.title} items">
-		<i class="fa fa-${type.cls}"></i>${len}</div>`;
+	const len = state.clip && state.clip.length;
+	if (!len) return '';
+	return `<div class="footer-stats-item" title="Remembered items">
+		<i class="fa fa-files-o"></i>${len}</div>`;
 }
 
 

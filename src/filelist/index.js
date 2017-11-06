@@ -1,30 +1,36 @@
 const { $, EVENT, helper, dialog, config } = require('../core');
-const { Files, Clipboard } = require('../services');
+const { Files } = require('../services');
+const Clipboard = require('../clipboard');
 const FileList = require('./filelist');
 
 let flist;
 
 
-// function doClipboardAction (action) {
-// 	if (fileNameEditMode) return;
-// 	const items = listView.getSelectedItems(true);
-// 	if (items.length) Clipboard.save({ action, items });
-// }
+function remember () {
+	let items = flist.getSelectedItems();
+	if (!items.length) items = [flist.getHighlightedItem()];
+	if (items.length) Clipboard.save(items);
+}
 
+function copy () {
+	const clip = Clipboard.get();
+	const currentDir = flist.getCurrentDir();
+	Files.copy(clip, currentDir)
+		.then(() => {
+			flist.load();
+			Clipboard.clear();
+		});
+}
 
-// function paste () {
-// 	if (fileNameEditMode) return;
-// 	const clip = Clipboard.get();
-// 	const action = (clip.action === 'cut') ? 'move' : clip.action;
-
-// 	if (typeof Files[action] !== 'function') return console.log('Unknown action:', action);
-
-// 	Files[action](clip.items, currentDir).then(() => {
-// 		Clipboard.clear();
-// 		reload(listView.getSelectedItem().name);
-// 	});
-// }
-
+function move () {
+	const clip = Clipboard.get();
+	const currentDir = flist.getCurrentDir();
+	Files.move(clip, currentDir)
+		.then(() => {
+			flist.load();
+			Clipboard.clear();
+		});
+}
 
 
 function toggleHidden () {
@@ -83,14 +89,19 @@ function init () {
 
 	// $.on(EVENT.filelist.undo, undo);
 	// $.on(EVENT.filelist.redo, redo);
-	// $.on(EVENT.filelist.cut, () => doClipboardAction('cut'));
-	// $.on(EVENT.filelist.copy, () => doClipboardAction('copy'));
-	// $.on(EVENT.filelist.paste, paste);
+
+	$.on(EVENT.filelist.remember, remember);
+	$.on(EVENT.filelist.copy, copy);
+	$.on(EVENT.filelist.move, move);
+
+	$.on(EVENT.filelist.delete, del);
 	$.on(EVENT.filelist.rename, () => flist.rename());
+
 	$.on(EVENT.filelist.newfile, () => flist.newItem('file'));
 	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
-	$.on(EVENT.filelist.delete, del);
+
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
+
 	$.on(EVENT.filelist.select, () => flist.selectItem());
 	$.on(EVENT.filelist.selectall, () => flist.selectAll());
 	$.on(EVENT.filelist.unselectall, () => flist.unselectAll());

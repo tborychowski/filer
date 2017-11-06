@@ -3,7 +3,7 @@ const FS = require('fs-extra');
 const Path = require('path');
 // const Copy = require('copy');
 const Copy = require('recursive-copy');
-
+const FileExtMap = require('./file-ext-map.js');
 
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
@@ -14,27 +14,13 @@ const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;	// for sorting
 
-
-const FILE_TYPES = {
-	code: { js: 1, css: 1, html: 1, php: 1, xml: 1, json: 1, ts: 1, sh: 1 },
-	image: { png: 1, jpg: 1, jpeg: 1, gif: 1 },
-	video: { avi: 1, mpg: 1, mpeg: 1, mp4: 1, mkv: 1, mov: 1 },
-	audio: { mp3: 1, flac: 1, wav: 1, mid: 1 },
-	archive: { zip: 1, rar: 1, '7z': 1, tar: 1, gz: 1 },
-	text: { txt: 1, srt: 1, md: 1, log: 1 },
-	pdf: { pdf: 1 },
-	word: { doc: 1, docx: 1 },
-	excel: { xls: 1, xlsx: 1 },
-	powerpoint: { ppt: 1, pptx: 1 },
-};
-
 // /some/long/path => /some/long
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
 
 
 function findFileIcon (ext = '') {
 	ext = ext.toLowerCase().substr(1);
-	for (let t in FILE_TYPES) if (ext in FILE_TYPES[t]) return `file-${t}-o`;
+	if (FileExtMap[ext]) return `file-${FileExtMap[ext]}-o`;
 	return 'file-o';
 }
 
@@ -124,7 +110,7 @@ function rm (path) {
 }
 
 
-function _copy (op) {
+function _copyItem (op) {
 	return Copy(op.src, op.dest, { dot: true })
 		// .on(Copy.events.COPY_FILE_START, copyOp => {
 		// 	console.info('Copying file ' + copyOp.src + '...');
@@ -133,10 +119,9 @@ function _copy (op) {
 		// 	console.info('Copied to ', copyOp);
 		// })
 		.on(Copy.events.ERROR, err => (op.error = err.code))
-		.then(res => (op.res = res, op))
+		.then(res => res[0])
 		.catch(() => op);
 }
-
 
 // loop through files and do copy
 // - gather failed and loop again
@@ -145,21 +130,22 @@ function _copy (op) {
 
 function copy (items, path) {
 	const ops = items
-		.map(i => ({ src: i.path, dest: Path.join(path, i.name) }))
-		.map(_copy);
-
-
-	return Promise.all(ops)
-		.then(res => console.log(res));
-
+		.map(src => ({ src, dest: Path.join(path, Path.basename(src)) }))
+		.map(_copyItem);
+	return Promise.all(ops);
 }
-
-
 
 
 function move (items, path) {
-	return Promise.resolve();
+	return copy(items, path)
+		.then(res => {
+			if (!res.length) return Promise.resolve([]);
+			res = res.map(i => i.src).map(i => FS.remove(i));
+			return Promise.all(res);
+		});
 }
+
+
 
 module.exports = {
 	readDir,

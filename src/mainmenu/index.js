@@ -1,9 +1,13 @@
 const { Menu } = require('electron').remote;
 const { $, EVENT, helper } = require('../core');
 
+
 const option = (label, accelerator, event) => {
 	return { label, accelerator, click: () => $.trigger(event) };
 };
+
+let menu;
+
 
 const menuTemplate = [
 	{
@@ -11,7 +15,6 @@ const menuTemplate = [
 		submenu: [
 			{ role: 'about' },
 			{ type: 'separator' },
-
 			// { label: 'Check for Updates...', click: () => $.trigger(EVENT.updater.check) },
 			// { label: 'Changelog', click: () => helper.openChangelog(helper.appVersion) },
 			// { type: 'separator' },
@@ -37,15 +40,31 @@ const menuTemplate = [
 			option('Redo', 'CmdOrCtrl+Shift+Z', EVENT.filelist.redo),
 			{ type: 'separator' },
 
-			option('Cut', 'CmdOrCtrl+X', EVENT.filelist.cut),
-			option('Copy', 'CmdOrCtrl+C', EVENT.filelist.copy),
-			option('Paste', 'CmdOrCtrl+V', EVENT.filelist.paste),
+			{ role: 'cut' },
+			{ role: 'copy' },
+			{ role: 'paste' },
+			{ type: 'separator' },
+
+			option('Remember Items', 'Shift+CmdOrCtrl+S', EVENT.filelist.remember),
+			{
+				id: 'copyBtn',
+				label: 'Copy Items Here',
+				accelerator: 'Shift+CmdOrCtrl+C',
+				enabled: false,
+				click: () => $.trigger(EVENT.filelist.copy)
+			},
+			{
+				id: 'moveBtn',
+				label: 'Move Items Here',
+				accelerator: 'Shift+CmdOrCtrl+M',
+				enabled: false,
+				click: () => $.trigger(EVENT.filelist.move)
+			},
 			{ type: 'separator' },
 
 			option('Delete', 'CmdOrCtrl+Backspace', EVENT.filelist.delete),
 			option('Rename', 'CmdOrCtrl+Enter', EVENT.filelist.rename),
 			{ type: 'separator' },
-
 
 			option('New File', 'CmdOrCtrl+M', EVENT.filelist.newfile),
 			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
@@ -94,10 +113,24 @@ const menuTemplate = [
 ];
 
 
+function onClipboardFull () {
+	menu.getMenuItemById('copyBtn').enabled = true;
+	menu.getMenuItemById('moveBtn').enabled = true;
+}
+
+function onClipboardEmpty () {
+	menu.getMenuItemById('copyBtn').enabled = false;
+	menu.getMenuItemById('moveBtn').enabled = false;
+}
+
+
 
 function init () {
-	const menu = Menu.buildFromTemplate(menuTemplate);
+	menu = Menu.buildFromTemplate(menuTemplate);
 	Menu.setApplicationMenu(menu);
+
+	$.on(EVENT.clipboard.full, onClipboardFull);
+	$.on(EVENT.clipboard.empty, onClipboardEmpty);
 }
 
 

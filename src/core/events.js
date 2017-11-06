@@ -1,6 +1,8 @@
 module.exports = {
 	clipboard: {
-		changed: 'clipboard-changed'
+		changed: 'clipboard-changed',
+		full: 'clipboard-full',
+		empty: 'clipboard-empty',
 	},
 
 	document: {
@@ -18,14 +20,16 @@ module.exports = {
 		undo: 'filelist-undo',
 		redo: 'filelist-redo',
 
+		remember: 'filelist-remember',
 		copy: 'filelist-copy',
-		cut: 'filelist-cut',
-		paste: 'filelist-paste',
+		move: 'filelist-move',
+
 		delete: 'filelist-delete',
 		rename: 'filelist-rename',
 
 		newfolder: 'filelist-new-folder',
 		newfile: 'filelist-new-file',
+
 		togglehidden: 'toggle-hidden',
 
 		select: 'filelist-select',
