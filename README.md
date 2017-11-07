@@ -8,19 +8,26 @@ A File Manager for the Keyboard People.
 - bookmarks bar - store history folders...
 	- cmd+p should focus search but trigger the path-finder mode (filter bookmarks)
 	- command-palette
-- core: copy, cut & paste (visual & progress)
+- toolbar buttons for:
+	- new folder
+	- new file
+	- open stuff here
+- visual & progress for copy, paste & move
+	- a tooltip over statusbar on copy?
+	- flash the newly pasted item yellow (or sth.)
 - addon: open terminal here
 - addon: open finder here
 - addon: open any app (sublime) here...
+- addon: show notifications for some actions
+    - e.g. delete (when undo is there, we could skip the confirmation)
 - git: open repo here
 - core: bulk rename, delete
 - core: create nested folders (my/new/folder/path)
 - core: cache folders, and bg sync
 - core: settings (json?)
-- breadcrumbs: make it nicer and clickable?
 - undo/redo (operation history)
-- core: show item stats (dates, sizes, ...)
 
+- if clicked on the highlighted after 1s item - trigger rename
 
 
 

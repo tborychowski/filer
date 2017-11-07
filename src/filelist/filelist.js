@@ -164,9 +164,6 @@ FileList.prototype.onInput = function () {
 FileList.prototype.onClick = function (e) {
 	const target = e.target.closest('.filelist-item');
 	if (!target) return;
-
-	// TODO: if clicked on the highlighted item - trigger rename
-
 	this.state.highlightedIndex = Array.from(target.parentNode.children).indexOf(target);
 	return this.unselectAll().highlight();
 };
@@ -409,6 +406,9 @@ FileList.prototype.getItemByIdx = function (idx) {
 };
 
 
+FileList.prototype.getMode = function () {
+	return this.state.mode;
+};
 
 
 FileList.prototype.getNextName = function (itemName = 'Folder') {

@@ -1,5 +1,6 @@
 const { Menu } = require('electron').remote;
 const { $, EVENT, helper } = require('../core');
+const Keyboard = require('mousetrap');		// what a ridiculous name!
 
 
 const option = (label, accelerator, event) => {
@@ -7,6 +8,7 @@ const option = (label, accelerator, event) => {
 };
 
 let menu;
+
 
 
 const menuTemplate = [
@@ -40,26 +42,10 @@ const menuTemplate = [
 			option('Redo', 'CmdOrCtrl+Shift+Z', EVENT.filelist.redo),
 			{ type: 'separator' },
 
-			{ role: 'cut' },
+			{ role: 'cut' },	// these 3 need to stay native so they work in textfields
 			{ role: 'copy' },
 			{ role: 'paste' },
-			{ type: 'separator' },
-
-			option('Remember Items', 'Shift+CmdOrCtrl+S', EVENT.filelist.remember),
-			{
-				id: 'copyBtn',
-				label: 'Copy Items Here',
-				accelerator: 'Shift+CmdOrCtrl+C',
-				enabled: false,
-				click: () => $.trigger(EVENT.filelist.copy)
-			},
-			{
-				id: 'moveBtn',
-				label: 'Move Items Here',
-				accelerator: 'Shift+CmdOrCtrl+M',
-				enabled: false,
-				click: () => $.trigger(EVENT.filelist.move)
-			},
+			option('Move', 'Shift+CmdOrCtrl+V', EVENT.filelist.move),
 			{ type: 'separator' },
 
 			option('Delete', 'CmdOrCtrl+Backspace', EVENT.filelist.delete),
@@ -70,7 +56,7 @@ const menuTemplate = [
 			option('New Folder', 'CmdOrCtrl+N', EVENT.filelist.newfolder),
 			{ type: 'separator' },
 
-			option('Select', 'Space', EVENT.filelist.select),
+			option('Select', 'CmdOrCtrl+S', EVENT.filelist.select),
 			option('Select All', 'CmdOrCtrl+A', EVENT.filelist.selectall),
 			option('Unselect All', 'CmdOrCtrl+Shift+A', EVENT.filelist.unselectall),
 			{ type: 'separator' },
@@ -87,6 +73,9 @@ const menuTemplate = [
 			option('Toggle Hidden', 'CmdOrCtrl+.', EVENT.filelist.togglehidden),
 			{ type: 'separator' },
 
+			option('Quick Look', 'Space', EVENT.filelist.quicklook),
+			{ type: 'separator' },
+
 			{ role: 'togglefullscreen' }
 		]
 	},
@@ -97,8 +86,8 @@ const menuTemplate = [
 		label: 'Dev',
 		submenu: [
 			{ role: 'toggledevtools' },
-			{ type: 'separator' },
-			option('Purge Settings & Caches', 'CmdOrCtrl+Shift+Backspace', EVENT.settings.purge),
+			// { type: 'separator' },
+			// option('Purge Settings & Caches', 'CmdOrCtrl+Shift+Backspace', EVENT.settings.purge),
 		]
 	},
 	{
@@ -113,24 +102,30 @@ const menuTemplate = [
 ];
 
 
-function onClipboardFull () {
-	menu.getMenuItemById('copyBtn').enabled = true;
-	menu.getMenuItemById('moveBtn').enabled = true;
+// function onClipboardFull () {
+// 	menu.getMenuItemById('copyBtn').enabled = true;
+// 	menu.getMenuItemById('moveBtn').enabled = true;
+// }
+
+// function onClipboardEmpty () {
+// 	menu.getMenuItemById('copyBtn').enabled = false;
+// 	menu.getMenuItemById('moveBtn').enabled = false;
+// }
+
+
+function initOtherShortcuts () {
+	Keyboard
+		.bind('meta+c', e => $.trigger(EVENT.filelist.copy, e))
+		.bind('meta+v', e => $.trigger(EVENT.filelist.paste, e));
 }
-
-function onClipboardEmpty () {
-	menu.getMenuItemById('copyBtn').enabled = false;
-	menu.getMenuItemById('moveBtn').enabled = false;
-}
-
-
 
 function init () {
 	menu = Menu.buildFromTemplate(menuTemplate);
 	Menu.setApplicationMenu(menu);
+	initOtherShortcuts();
 
-	$.on(EVENT.clipboard.full, onClipboardFull);
-	$.on(EVENT.clipboard.empty, onClipboardEmpty);
+	// $.on(EVENT.clipboard.full, onClipboardFull);
+	// $.on(EVENT.clipboard.empty, onClipboardEmpty);
 }
 
 

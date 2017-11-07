@@ -20,8 +20,8 @@ module.exports = {
 		undo: 'filelist-undo',
 		redo: 'filelist-redo',
 
-		remember: 'filelist-remember',
 		copy: 'filelist-copy',
+		paste: 'filelist-paste',
 		move: 'filelist-move',
 
 		delete: 'filelist-delete',
@@ -31,6 +31,7 @@ module.exports = {
 		newfile: 'filelist-new-file',
 
 		togglehidden: 'toggle-hidden',
+		quicklook: 'toggle-quicklook',
 
 		select: 'filelist-select',
 		selectall: 'filelist-select-all',

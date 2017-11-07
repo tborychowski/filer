@@ -6,13 +6,17 @@ const FileList = require('./filelist');
 let flist;
 
 
-function remember () {
+function copy (e) {
+	if (flist.getMode() !== 'nav') return;
+	e.preventDefault();
 	let items = flist.getSelectedItems();
 	if (!items.length) items = [flist.getHighlightedItem()];
 	if (items.length) Clipboard.save(items);
 }
 
-function copy () {
+function paste (e) {
+	if (flist.getMode() !== 'nav') return;
+	e.preventDefault();
 	const clip = Clipboard.get();
 	const currentDir = flist.getCurrentDir();
 	Files.copy(clip, currentDir)
@@ -36,6 +40,11 @@ function move () {
 function toggleHidden () {
 	config.set('showHidden', !config.get('showHidden'));
 	flist.load();
+}
+
+function quicklook () {
+	const item = flist.getHighlightedItem();
+	helper.quicklook(item.path, item.name);
 }
 
 
@@ -90,8 +99,8 @@ function init () {
 	// $.on(EVENT.filelist.undo, undo);
 	// $.on(EVENT.filelist.redo, redo);
 
-	$.on(EVENT.filelist.remember, remember);
 	$.on(EVENT.filelist.copy, copy);
+	$.on(EVENT.filelist.paste, paste);
 	$.on(EVENT.filelist.move, move);
 
 	$.on(EVENT.filelist.delete, del);
@@ -101,6 +110,7 @@ function init () {
 	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
 
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
+	$.on(EVENT.filelist.quicklook, quicklook);
 
 	$.on(EVENT.filelist.select, () => flist.selectItem());
 	$.on(EVENT.filelist.selectall, () => flist.selectAll());

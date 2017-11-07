@@ -2,9 +2,7 @@ const { $, EVENT } = require('../core');
 const C = require('nodobjc');
 const Plist = require('plist');
 
-let clip = [];
-let prev, pasteboard;
-
+let clip = [], prevCount, pasteboard;
 
 
 function copyFilesToClipboard(paths) {
@@ -18,7 +16,6 @@ function copyFilesToClipboard(paths) {
 }
 
 
-
 function fetch (type) {
 	const dt = pasteboard('dataForType', type);
 	const str = C.NSString('alloc')('initWithData', dt, 'encoding', C.NSUTF8StringEncoding);
@@ -28,12 +25,19 @@ function fetch (type) {
 
 
 function check () {
-	if (pasteboard('changeCount') === prev) return;
-	prev = pasteboard('changeCount');
+	if (pasteboard('changeCount') === prevCount) return;
+	prevCount = pasteboard('changeCount');
 	// console.log(pb('types'));
 	const paths = fetch(C.NSFilenamesPboardType);
 	if (paths.length) clipboardFull(paths);
 }
+
+function clipboardFull (data) {
+	clip = data;
+	$.trigger(EVENT.clipboard.changed, clip);					// realistically - to reflect the actual state
+	$.trigger(EVENT.clipboard[data.length ? 'full' : 'empty']);	// for visual changes in mainmenu
+}
+
 
 
 
@@ -43,13 +47,9 @@ function get () {
 }
 
 function save (data = []) {
-	if (data.length) copyFilesToClipboard(data.map(i => i.path));
-}
-
-function clipboardFull (data) {
-	clip = data;
-	$.trigger(EVENT.clipboard.changed, clip);
-	$.trigger(EVENT.clipboard[data.length ? 'full' : 'empty']);
+	data = data.map(i => i.path);
+	$.trigger(EVENT.clipboard.changed, data);					// early - to avoid visual delay in footer
+	if (data.length) copyFilesToClipboard(data);
 }
 
 
@@ -59,13 +59,8 @@ function init () {
 	C.framework('AppKit');
 	pasteboard = C.NSPasteboard('generalPasteboard');
 	C.NSAutoreleasePool('alloc')('init');
-
 	setInterval(check, 1000);
 }
-
-
-
-
 
 
 

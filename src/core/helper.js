@@ -48,6 +48,10 @@ const openChangelog = ver => {
 	openInBrowser(`${repo}/releases/${ver ? `tag/v${ver}` : 'latest'}`);
 };
 
+function quicklook (path, name) {
+	getCurrentWindow().previewFile(path, name);
+	// win.closeFilePreview()
+}
 
 function setBadge (text = 0) {
 	text = parseInt(text, 10);
@@ -110,6 +114,7 @@ module.exports = {
 	setBadge,
 	setDockProgress,
 	openChangelog,
+	quicklook,
 	homeDir,
 	pathSep,
 	init
