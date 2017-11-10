@@ -22,9 +22,6 @@ git clone https://github.com/tborychowski/filer.git
 cd filer
 yarn
 yarn start
-
-# build for mac:
-yarn build
 ```
 
 
