@@ -28,7 +28,6 @@ function FileList (config = {}) {
 		openFile: [],
 		loaded: [],
 		dirChange: [],
-		deleteItem: [],
 		change: [],							// anything: filtering, selection, copy, etc.
 		newItem: [],
 		rename: [],
@@ -177,8 +176,7 @@ FileList.prototype.onKeydown = function (e) {
 	}
 	if (e.key === 'Enter') {
 		this.input.blur();
-		if (e.metaKey) return this.rename();
-		return this.openItem();
+		if (!e.metaKey) return this.openItem();
 	}
 	if (e.key === 'ArrowDown') {
 		this.input.blur();
@@ -192,10 +190,7 @@ FileList.prototype.onKeydown = function (e) {
 		if (e.key === ' ') return;
 		if (e.key === 'ArrowLeft') return this.pageUp();
 		if (e.key === 'ArrowRight') return this.pageDown();
-		if (e.key === 'Backspace') {
-			if (e.metaKey) return this.triggerEvent('deleteItem');
-			return this.goUp();
-		}
+		if (e.key === 'Backspace') if (!e.metaKey) return this.goUp();
 		if ($.isAlphaNumeric(e)) return this.input.focus();
 	}
 };

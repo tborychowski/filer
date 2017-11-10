@@ -68,12 +68,22 @@ function reloadAfterDelete () {
 	});
 }
 
-function del (item = flist.getHighlightedItem()) {
-	if (item.name === '..') return;
+function del () {
+	let items = flist.getSelectedItems();
+	if (!items.length) {
+		items = [flist.getHighlightedItem()];
+		if (items[0].name === '..') return;
+	}
+
+	const names = items.map(i => i.name).join('"\n"');
 	dialog
-		.question({ message: `Delete "${item.name}"?` })
+		.question({
+			message: 'Delete?',
+			detail: `"${names}"`,
+			buttons: ['Delete', 'No' ]
+		})
 		.then(res => {
-			if (res === 0) Files.rm(item.path).then(reloadAfterDelete);
+			if (res === 0) Files.rm(items).then(reloadAfterDelete);
 		});
 }
 
@@ -90,7 +100,6 @@ function init () {
 			config.set('currentDir', path);
 			$.trigger(EVENT.dir.changed, path);
 		})
-		.on('deleteItem', del)
 		.on('newItem', newItem)
 		.on('rename', rename)
 		.start();

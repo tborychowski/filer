@@ -109,8 +109,11 @@ function mkfile (path, name) {
 }
 
 
-function rm (path) {
-	return Promise.resolve(shell.moveItemToTrash(path));
+function rm (items) {
+	const ops = items
+		.map(i => i.path)
+		.map(shell.moveItemToTrash);
+	return Promise.resolve(ops);
 }
 
 
