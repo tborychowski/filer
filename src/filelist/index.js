@@ -27,6 +27,7 @@ function paste (e) {
 }
 
 function move () {
+	if (flist.getMode() !== 'nav') return;
 	const clip = Clipboard.get();
 	const currentDir = flist.getCurrentDir();
 	Files.move(clip, currentDir)
@@ -43,18 +44,21 @@ function toggleHidden () {
 }
 
 function quicklook () {
+	if (flist.getMode() !== 'nav') return;
 	const item = flist.getHighlightedItem();
 	helper.quicklook(item.path, item.name);
 }
 
 
 function newItem (type, newName) {
+	if (flist.getMode() !== 'nav') return;
 	const action = type === 'folder' ? 'mkdir' : 'mkfile';
 	const currentDir = flist.getCurrentDir();
 	Files[action](currentDir, newName).then(() => flist.load(newName));
 }
 
 function rename (newName, item) {
+	if (flist.getMode() !== 'nav') return;
 	Files.rename(item, newName).then(() => flist.load(newName));
 }
 
@@ -112,15 +116,13 @@ function init () {
 	$.on(EVENT.filelist.paste, paste);
 	$.on(EVENT.filelist.move, move);
 
-	$.on(EVENT.filelist.delete, del);
-	$.on(EVENT.filelist.rename, () => flist.rename());
-
-	$.on(EVENT.filelist.newfile, () => flist.newItem('file'));
-	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
-
 	$.on(EVENT.filelist.togglehidden, toggleHidden);
 	$.on(EVENT.filelist.quicklook, quicklook);
 
+	$.on(EVENT.filelist.delete, del);
+	$.on(EVENT.filelist.rename, () => flist.rename());
+	$.on(EVENT.filelist.newfile, () => flist.newItem('file'));
+	$.on(EVENT.filelist.newfolder, () => flist.newItem('folder'));
 	$.on(EVENT.filelist.select, () => flist.selectItem());
 	$.on(EVENT.filelist.selectall, () => flist.selectAll());
 	$.on(EVENT.filelist.unselectall, () => flist.unselectAll());

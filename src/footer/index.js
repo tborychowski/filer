@@ -12,21 +12,25 @@ let state = {
 };
 
 function getAllHtml () {
+	const items = state.items && state.items.all || 0;
 	return `<div class="footer-stats-item" title="All items">
-		<i class="fa fa-file-o"></i>${state.items.all}</div>`;
+		<i class="fa fa-file-o"></i>${items}</div>`;
 }
 
 
 function getFilteredHtml () {
-	if (state.items.filtered >= state.items.all) return '';
+	const items = state.items && state.items.filtered || 0;
+	const all =  state.items && state.items.all || 0;
+	if (items >= all) return '';
 	return `<div class="footer-stats-item" title="Filtered items">
-		<i class="fa fa-filter"></i>${state.items.filtered}</div>`;
+		<i class="fa fa-filter"></i>${items}</div>`;
 }
 
 function getSelectedHtml () {
-	if (!state.items.selected) return '';
+	const items = state.items && state.items.selected || 0;
+	if (!items) return '';
 	return `<div class="footer-stats-item" title="Selected items">
-		<i class="fa fa-check-square-o"></i>${state.items.selected}</div>`;
+		<i class="fa fa-check-square-o"></i>${items}</div>`;
 }
 
 function getCopiedHtml () {

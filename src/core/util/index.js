@@ -1,3 +1,4 @@
+const longClick = require('./long-click');
 const sizzle = require('./sizzle');
 const ajax = require('./ajax');
 const form = require('./form');
@@ -8,5 +9,9 @@ const util = require('./util');
 let all = { ajax, form };
 Object.assign(all, ajax, pubsub, keys, util);
 for (let prop in all) sizzle[prop] = all[prop];
+
+
+longClick.init();
+
 
 module.exports = sizzle;

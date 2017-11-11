@@ -64,7 +64,7 @@ FilelistEdit.prototype.cancel = function () {
 
 FilelistEdit.prototype.save = function () {
 	if (!this.state.rendered) return this;
-	let name = this.input.value;
+	let name = this.input.value.trim();
 	if (typeof this.config.validator === 'function') {
 		if (this.config.validator(name) !== true && name !== this.value) {
 			this.input.select();

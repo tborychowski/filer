@@ -90,8 +90,9 @@ FileList.prototype.initEvents = function () {
 		this.input.addEventListener('blur', this.onBlur.bind(this));
 		this.input.addEventListener('input', this.onInput.bind(this));
 	}
-	this.list.addEventListener('click', this.onClick.bind(this));
+	this.list.addEventListener('mousedown', this.onMouseDown.bind(this));
 	this.list.addEventListener('dblclick', this.openItem.bind(this));
+	this.list.addEventListener('longclick', this.rename.bind(this));
 	document.addEventListener('keydown', this.onKeydown.bind(this));
 	return this;
 };
@@ -134,6 +135,7 @@ FileList.prototype.goUp = function () {
 };
 
 FileList.prototype.openItem = function () {
+	if (this.state.mode !== 'nav') return this;
 	const item = this.getHighlightedItem();
 	if (item.isDir) {
 		if (item.name === '..') this.goUp();
@@ -160,7 +162,8 @@ FileList.prototype.onInput = function () {
 };
 
 
-FileList.prototype.onClick = function (e) {
+FileList.prototype.onMouseDown = function (e) {
+	if (this.state.mode !== 'nav') return this;
 	const target = e.target.closest('.filelist-item');
 	if (!target) return;
 	this.state.highlightedIndex = Array.from(target.parentNode.children).indexOf(target);
