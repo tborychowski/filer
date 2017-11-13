@@ -456,6 +456,7 @@ FileList.prototype.rename = function () {
 	this.state.mode = 'name-edit';
 	ListEdit(item.el, { value: item.name, validator: this.fileNameValidator.bind(this) })
 		.on('save', newName => {
+			this.state.mode = 'nav';
 			this.triggerEvent('rename', newName);
 		})
 		.on('done', () => {
