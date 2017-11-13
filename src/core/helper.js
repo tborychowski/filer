@@ -1,5 +1,5 @@
 const electron = require('electron');
-const {clipboard, nativeImage } = electron;
+const {clipboard, nativeImage, ipcRenderer } = electron;
 const {shell, app, getCurrentWindow} = electron.remote || electron;
 const {exec} = require('child_process');
 const config = require('./config');
@@ -110,8 +110,11 @@ function init (components, path = '../') {
 		if (m && m.init) m.init();
 	});
 
-	window.addEventListener('blur', () => document.body.classList.add('inactive'));
-	window.addEventListener('focus', () => document.body.classList.remove('inactive'));
+	ipcRenderer.on('window', (ev, name) => {
+		if (name === 'blur') document.body.classList.add('inactive');
+		else if (name === 'focus') document.body.classList.remove('inactive');
+	});
+
 	window.focus();
 }
 
