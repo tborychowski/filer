@@ -109,11 +109,10 @@ function init (components, path = '../') {
 		const m = require(`${path}${c}`);
 		if (m && m.init) m.init();
 	});
-	window.focus();
 
-	getWin()
-		.on('blur', () => document.body.classList.add('inactive'))
-		.on('focus', () => document.body.classList.remove('inactive'));
+	window.addEventListener('blur', () => document.body.classList.add('inactive'));
+	window.addEventListener('focus', () => document.body.classList.remove('inactive'));
+	window.focus();
 }
 
 
