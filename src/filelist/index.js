@@ -1,9 +1,20 @@
 const { $, EVENT, helper, dialog, config } = require('../core');
-const { Files } = require('../services');
+const { Files, Git } = require('../services');
 const Clipboard = require('../clipboard');
 const FileList = require('./filelist');
 
 let flist;
+
+
+function open (what) {
+	const dir = flist.getCurrentDir();
+	if (what === 'folder') helper.openFolder(dir);
+	else if (what === 'terminal') helper.openInTerminal(dir);
+	else if (what === 'repo') {
+		const url = Git.getRepoUrl(dir);
+		if (url) helper.openInBrowser(url);
+	}
+}
 
 
 function copy (e) {
@@ -127,6 +138,13 @@ function init () {
 	$.on(EVENT.filelist.selectall, () => flist.selectAll());
 	$.on(EVENT.filelist.unselectall, () => flist.unselectAll());
 	$.on(EVENT.search.start, () => flist.onFocus());
+
+
+	$.on(EVENT.filelist.openfolder, () => open('folder'));
+	$.on(EVENT.filelist.openterminal, () => open('terminal'));
+	$.on(EVENT.filelist.openrepo, () => open('repo'));
+
+
 }
 
 

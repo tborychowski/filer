@@ -1,0 +1,79 @@
+@require '_lib'
+
+
+.toolbar-btn
+.filelist-input
+	font inherit
+	border-radius 4px
+	border 0.5px solid rgba(#444, 0.3)
+	border-color #c2c0c2 #c2c0c2 #a19fa1
+	padding 0 12px
+	color inherit
+	background-color rgba(#fff, 0.95)
+	box-shadow: 0 0.5px 0.5px rgba(0, 0, 0, .06)
+
+
+.filelist-input
+	&::placeholder
+		color #ccc
+		text-align center
+
+	&:focus
+		&::placeholder
+			color #fff
+
+
+.toolbar
+	height 26px
+	display flex
+	flex 1
+	padding 2px 0 7px
+
+
+.toolbar-filler
+	flex 1
+
+
+.toolbar-btn
+	margin-right 10px
+	min-width 42px
+	padding-top 0
+	padding-bottom 1px
+	font-size 13px
+
+	&:active
+		background-color #ececec
+
+	i
+		pointer-events none
+
+
+.toolbar-btn-group
+	display flex
+	margin-right 20px
+
+	.toolbar-btn
+		margin 0
+
+		& + .toolbar-btn
+			margin-left -1px
+			border-radius 0
+
+		&:first-child
+			border-radius 4px 0 0 4px
+
+		&:last-child
+			border-radius 0 4px 4px 0
+
+		&:active
+		&:focus
+			z-index 10
+
+
+
+.inactive
+	.toolbar-btn
+	.filelist-input
+		box-shadow none
+		border-color #ddd
+

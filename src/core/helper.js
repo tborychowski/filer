@@ -13,6 +13,7 @@ const appVersion = app.getVersion();
 const appRepoUrl = pkg.repository.url;
 const homeDir = app.getPath('home');
 const pathSep = PATH.sep;
+let win;
 
 
 const getOpenBrowserCmd = (browser, url) => ({
@@ -28,6 +29,14 @@ function openInBrowser (url) {
 		if ((err || stderr) && isDev) console.log(err || stderr);
 	});
 }
+
+
+function openInTerminal (dir) {
+	exec(`open -a Terminal ${dir}`, (err, stdout, stderr) => {
+		if ((err || stderr) && isDev) console.log(err || stderr);
+	});
+}
+
 
 const getPackage = (key) => {
 	let pckg;
@@ -49,16 +58,14 @@ const openChangelog = ver => {
 };
 
 function quicklook (path, name) {
-	getCurrentWindow().previewFile(path, name);
-	// win.closeFilePreview()
+	getWin().previewFile(path, name);
 }
 
 function setBadge (text = 0) {
 	text = parseInt(text, 10);
 	if (process.platform !== 'win32') app.setBadgeCount(text);
 	else {														// yep, this is for windows...
-		const win = getCurrentWindow();
-		if (text === 0) return win.setOverlayIcon(null, '');
+		if (text === 0) return getWin().setOverlayIcon(null, '');
 		const canvas = document.createElement('canvas');
 		canvas.height = 140;
 		canvas.width = 140;
@@ -82,15 +89,19 @@ function setBadge (text = 0) {
 			ctx.fillText(text, 70, 112);
 		}
 		let img = nativeImage.createFromDataURL(canvas.toDataURL());
-		win.setOverlayIcon(img, text);
+		getWin().setOverlayIcon(img, text);
 	}
 }
 
 function setDockProgress (percent = -1) {
-	const win = getCurrentWindow();
-	win.setProgressBar(percent > 0 ? percent / 100 : percent);
+	getWin().setProgressBar(percent > 0 ? percent / 100 : percent);
 }
 
+
+function getWin () {
+	if (!win) win = getCurrentWindow();
+	return win;
+}
 
 function init (components, path = '../') {
 	document.title = appName;
@@ -99,13 +110,19 @@ function init (components, path = '../') {
 		if (m && m.init) m.init();
 	});
 	window.focus();
+
+	getWin()
+		.on('blur', () => document.body.classList.add('inactive'))
+		.on('focus', () => document.body.classList.remove('inactive'));
 }
+
 
 module.exports = {
 	appName,
 	appVersion,
 	appRepoUrl,
 	openInBrowser,
+	openInTerminal,
 	copyToClipboard,
 	openFolder,
 	openFile,

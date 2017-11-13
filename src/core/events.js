@@ -36,6 +36,10 @@ module.exports = {
 		select: 'filelist-select',
 		selectall: 'filelist-select-all',
 		unselectall: 'filelist-un-select-all',
+
+		openfolder: 'filelist-openfolder',
+		openterminal: 'filelist-openterminal',
+		openrepo: 'filelist-openrepo',
 	},
 
 	search: {

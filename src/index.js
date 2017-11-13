@@ -6,6 +6,7 @@ helper.init([
 	'footer',
 	'palette',
 	'clipboard',
+	'toolbar',
 
 	'filelist',	// better put it last
 ]);

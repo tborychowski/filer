@@ -5,39 +5,22 @@ header
 	left 0
 	right 0
 	top 0
+	-webkit-app-region drag
 	height header-h
 	display flex
 	flex-flow column
-
 	padding 0 10px
-
 	box-shadow 0 0.5px 0 #f5f4f5 inset
-
 	background-color #e8e6e8
 	background-image linear-gradient(to bottom, #e8e6e8 0, #d1cfd1 100%)
-
 	border-bottom 0.5px solid #c2c0c2
-
-	-webkit-app-region drag
-
-
-
-.toolbar
-	height 26px
-	display flex
-	flex 1
-	padding 3px 0 8px
-
-
-.toolbar-filler
-	flex 1
-
+	color #555
+	transition background .3s, color .3s
 
 
 .title
 	margin 0
 	font inherit
-	color #555
 	text-align center
 	height 18px
 	margin 3px 0
@@ -45,3 +28,8 @@ header
 	white-space nowrap
 	overflow hidden
 	text-overflow ellipsis
+
+
+.inactive header
+	background #F6F6F6
+	color #aaa

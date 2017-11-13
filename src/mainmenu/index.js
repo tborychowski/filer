@@ -76,6 +76,12 @@ const menuTemplate = [
 			option('Quick Look', 'Space', EVENT.filelist.quicklook),
 			{ type: 'separator' },
 
+			option('Open Finder', 'CmdOrCtrl+O', EVENT.filelist.openfolder),
+			option('Open Terminal', 'CmdOrCtrl+T', EVENT.filelist.openterminal),
+			option('Open Git Repository', 'CmdOrCtrl+G', EVENT.filelist.openrepo),
+			{ type: 'separator' },
+
+
 			{ role: 'togglefullscreen' }
 		]
 	},

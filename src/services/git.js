@@ -1,4 +1,5 @@
 const git = require('git-state');
+const execSync = require('child_process').execSync;
 
 
 /**
@@ -16,6 +17,22 @@ function status (path) {
 	});
 }
 
+
+
+function getRepoUrl(dir) {
+	const gitUrlCmd = 'remote=$(git config --get branch.master.remote);git config --get remote.$remote.url';
+	let url;
+	try { url = execSync(gitUrlCmd, {cwd: dir}); }
+	catch (e) { url = ''; }
+	url = url.toString().trim().replace(/\.git$/, '');
+
+	// reformat git-url of type: git@github.com:org/name to https://github.com/org/name
+	if (url.indexOf('git@') === 0) url = url.replace(':', '/').replace(/^git@/, 'https://');
+	return url;
+}
+
+
 module.exports = {
-	status
+	status,
+	getRepoUrl
 };
