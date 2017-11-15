@@ -42,7 +42,9 @@ function openInTerminal (dir) {
 
 function getPackage (key, dflt = '') {
 	if (!pckg) {
-		try { pckg = require(Path.join('..', '..', 'package.json')); }
+		// hack to suppres webpack warning
+		const path = Path.join('..', '..', 'package.json');
+		try { pckg = require(`${path}`); }
 		catch (e) { pckg = null; }
 	}
 	if (key) return _get(pckg || {}, key, dflt);
@@ -115,7 +117,7 @@ function getWin () {
 function init (components, path = '../') {
 	document.title = appName;
 	components.forEach(c => {
-		const m = require(`${path}${c}`);
+		const m = require(path + c);
 		if (m && m.init) m.init();
 	});
 

@@ -1,6 +1,6 @@
 const {app, BrowserWindow} = require('electron');
 const windowStateKeeper = require('electron-window-state');
-const helper = require('./app/core/helper');
+const title = require('./package.json').productName;
 
 let win;
 const send = (name, val) => win.webContents.send(name, val);
@@ -8,7 +8,7 @@ const send = (name, val) => win.webContents.send(name, val);
 function createWindow () {
 	const mainWindowState = windowStateKeeper({ defaultWidth: 1000, defaultHeight: 800 });
 	win = new BrowserWindow({
-		title: helper.appName,
+		title,
 		icon: __dirname + '/assets/icon.png',
 		show: false,
 		// titleBarStyle: 'hidden-inset',
