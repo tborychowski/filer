@@ -24,9 +24,10 @@ function createWindow () {
 	mainWindowState.manage(win);
 
 	win.loadURL(`file://${__dirname}/app/index.html`);
-	win.show();
+
 	// win.webContents.openDevTools();
 
+	win.once('ready-to-show', () => win.show());
 	win.on('blur', () => send('window', 'blur'));
 	win.on('focus', () => send('window', 'focus'));
 
