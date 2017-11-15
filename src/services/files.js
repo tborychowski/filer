@@ -6,6 +6,7 @@ const Copy = require('recursive-copy');
 const FileExtMap = require('./file-ext-map.js');
 const Chokidar = require('chokidar');
 
+
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
 const sep = helper.pathSep;
@@ -17,6 +18,30 @@ let CASE_SENSITIVE = false;	// for sorting
 
 // /some/long/path => /some/long
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
+
+
+// Monitors for file-system changes (to reload the file-list)
+const watcher = {
+	instance: null,
+	onChangeCallback: () => {},
+	options: {
+		depth: 0,
+		disableGlobbing: true,
+		ignoreInitial: true,
+		followSymlinks: false,
+	},
+	start: (dir) => {
+		watcher.stop();
+		watcher.instance = Chokidar
+			.watch(dir, watcher.options)
+			.on('raw', (ev, path, details) => watcher.onChangeCallback(ev, path, details));
+	},
+	stop: () => {
+		if (watcher.instance) watcher.instance.close();
+		watcher.instance = null;
+	}
+};
+
 
 
 function findFileIcon (ext = '') {
@@ -32,13 +57,9 @@ function getIconCls (type, ext) {
 }
 
 
-function sortFiles (dirPath, fileList, options) {
+function sortFiles (dirPath, fileList) {
 	if (!Array.isArray(fileList)) return [];
-
-	const isNotHidden = name => !dotRegEx.test(name);
-
 	naturalSort.insensitive = !CASE_SENSITIVE;
-	if (!options.showHidden) fileList = fileList.filter(isNotHidden);
 	return fileList.sort(naturalSort);
 }
 
@@ -84,15 +105,16 @@ function addFolderUp (parentPath, fileList) {
 	return fileList;
 }
 
-function readDir (path, options = { showHidden: false }) {
-	if (!path) path = '/';
-	watcher.start(path);
+
+function readDir (path, options) {
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
 		.then(files => addFolderUp(path, files))
+		.then(files => options.showHidden ? files : files.filter(i => !i.isHidden))
 		.catch(console.error.bind(console));
 }
+
 
 
 function rename (item, newName) {
@@ -153,29 +175,6 @@ function move (items, path) {
 			return Promise.all(res);
 		});
 }
-
-
-// Monitors for file-system changes (to reload the file-list)
-const watcher = {
-	instance: null,
-	onChangeCallback: () => {},
-	options: {
-		depth: 0,
-		disableGlobbing: true,
-		ignoreInitial: true,
-		followSymlinks: false,
-	},
-	start: (dir) => {
-		watcher.stop();
-		watcher.instance = Chokidar
-			.watch(dir, watcher.options)
-			.on('raw', (ev, path, details) => watcher.onChangeCallback(ev, path, details));
-	},
-	stop: () => {
-		if (watcher.instance) watcher.instance.close();
-		watcher.instance = null;
-	}
-};
 
 
 function onChange (cb) {

@@ -103,6 +103,7 @@ function del () {
 }
 
 
+
 function init () {
 	flist = FileList({
 		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),

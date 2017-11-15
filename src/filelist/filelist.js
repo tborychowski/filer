@@ -212,14 +212,15 @@ FileList.prototype.load = function (highlightDir) {
 		highlightDir = this.getHighlightedItem().name;
 		if (!highlightDir) highlightDir = this.getItemByIdx(this.state.highlightedIndex).name;
 	}
-	return this.dataSrc(this.state.currentDir)
-		.then(data => {
-			this.data.original = data;
-			this.data.filtered = Array.from(data);
-			return this.updateList(highlightDir);
-		});
+	return this.dataSrc(this.state.currentDir).then(data => this.setData(data, highlightDir));
 };
 
+
+FileList.prototype.setData = function (data, highlightDir) {
+	this.data.original = data;
+	this.data.filtered = Array.from(data);
+	return this.updateList(highlightDir);
+};
 
 
 //*** FILTERING ********************************************************************************

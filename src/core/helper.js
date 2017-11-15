@@ -5,15 +5,17 @@ const {exec} = require('child_process');
 const config = require('./config');
 const isDev = require('./isDev');
 const _get = require('lodash.get');
-const PATH = require('path');
-const pkg = require(PATH.resolve(__dirname, '..', '..', 'package.json'));
+const Path = require('path');
 
-const appName = pkg.productName || app.getName();
 const appVersion = app.getVersion();
-const appRepoUrl = pkg.repository.url;
 const homeDir = app.getPath('home');
-const pathSep = PATH.sep;
-let win;
+const pathSep = Path.sep;
+
+let win, pckg = null;
+
+const appId = getPackage('name');
+const appName = getPackage('productName', app.getName());
+const appRepoUrl = parseGitUrl(getPackage('repository.url'));
 
 
 const getOpenBrowserCmd = (browser, url) => ({
@@ -38,13 +40,21 @@ function openInTerminal (dir) {
 }
 
 
-const getPackage = (key) => {
-	let pckg;
-	try { pckg = require('../../package.json'); }
-	catch (e) { pckg = {}; }
-	if (key) return _get(pckg, key, '');
-	return pckg;
-};
+function getPackage (key, dflt = '') {
+	if (!pckg) {
+		try { pckg = require(Path.join('..', '..', 'package.json')); }
+		catch (e) { pckg = null; }
+	}
+	if (key) return _get(pckg || {}, key, dflt);
+	return pckg || {};
+}
+
+function parseGitUrl (url) {
+	url = url.toString().trim().replace(/\.git$/, '');
+	// reformat git-url of type: git@github.com:org/name to https://github.com/org/name
+	if (url.indexOf('git@') === 0) url = url.replace(':', '/').replace(/^git@/, 'https://');
+	return url;
+}
 
 const getUserDataFolder = () => app.getPath('userData');
 const copyToClipboard = (txt) => clipboard.writeText(txt);
@@ -53,8 +63,7 @@ const openFile = (path) => shell.openItem(path);
 
 const openSettingsFolder = () => openFolder(getUserDataFolder());
 const openChangelog = ver => {
-	const repo = getPackage('repository.url').replace(/.git$/, '');
-	openInBrowser(`${repo}/releases/${ver ? `tag/v${ver}` : 'latest'}`);
+	openInBrowser(`${appRepoUrl}/releases/${ver ? `tag/v${ver}` : 'latest'}`);
 };
 
 function quicklook (path, name) {
@@ -120,6 +129,7 @@ function init (components, path = '../') {
 
 
 module.exports = {
+	appId,
 	appName,
 	appVersion,
 	appRepoUrl,
@@ -133,6 +143,7 @@ module.exports = {
 	setBadge,
 	setDockProgress,
 	openChangelog,
+	parseGitUrl,
 	quicklook,
 	homeDir,
 	pathSep,

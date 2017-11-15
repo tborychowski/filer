@@ -8,7 +8,7 @@ helper.init([
 	'clipboard',
 	'toolbar',
 
-	'filelist',	// better put it last
+	'filelist',	// should be last
 ]);
 
 
