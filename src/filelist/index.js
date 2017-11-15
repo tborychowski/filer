@@ -120,6 +120,8 @@ function init () {
 		.start();
 
 
+	Files.onChange(reloadAfterDelete);
+
 	// $.on(EVENT.filelist.undo, undo);
 	// $.on(EVENT.filelist.redo, redo);
 

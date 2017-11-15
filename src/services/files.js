@@ -4,15 +4,16 @@ const Path = require('path');
 const PrettyBytes = require('pretty-bytes');
 const Copy = require('recursive-copy');
 const FileExtMap = require('./file-ext-map.js');
+const Chokidar = require('chokidar');
 
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
 const sep = helper.pathSep;
 
-
 const dotRegEx = /^\./;
 
 let CASE_SENSITIVE = false;	// for sorting
+
 
 // /some/long/path => /some/long
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
@@ -85,6 +86,7 @@ function addFolderUp (parentPath, fileList) {
 
 function readDir (path, options = { showHidden: false }) {
 	if (!path) path = '/';
+	watcher.start(path);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
@@ -153,6 +155,33 @@ function move (items, path) {
 }
 
 
+// Monitors for file-system changes (to reload the file-list)
+const watcher = {
+	instance: null,
+	onChangeCallback: () => {},
+	options: {
+		depth: 0,
+		disableGlobbing: true,
+		ignoreInitial: true,
+		followSymlinks: false,
+	},
+	start: (dir) => {
+		watcher.stop();
+		watcher.instance = Chokidar
+			.watch(dir, watcher.options)
+			.on('raw', (ev, path, details) => watcher.onChangeCallback(ev, path, details));
+	},
+	stop: () => {
+		if (watcher.instance) watcher.instance.close();
+		watcher.instance = null;
+	}
+};
+
+
+function onChange (cb) {
+	if (typeof cb === 'function') watcher.onChangeCallback = cb;
+}
+
 
 module.exports = {
 	readDir,
@@ -162,4 +191,5 @@ module.exports = {
 	rm,
 	copy,
 	move,
+	onChange,
 };
