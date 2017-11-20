@@ -131,7 +131,7 @@ FileList.prototype.goUp = function () {
 	const ar = this.state.currentDir.split(this.config.pathSeparator);
 	this.state.previousDir = ar.pop();
 	const newDir = ar.join(this.config.pathSeparator);
-	return this.gotoDir(newDir);
+	return this.gotoDir(newDir || '/');
 };
 
 FileList.prototype.openItem = function () {
@@ -441,6 +441,7 @@ FileList.prototype.newItem = function (type = 'folder') {
 	this.state.mode = 'name-edit';
 	ListEdit(el, { value: name, validator: this.fileNameValidator.bind(this) })
 		.on('save', newName => {
+			this.state.mode = 'nav';
 			this.triggerEvent('newItem', type, newName);
 		})
 		.on('done', () => {
