@@ -40,6 +40,7 @@ module.exports = {
 		openfolder: 'filelist-openfolder',
 		openterminal: 'filelist-openterminal',
 		openrepo: 'filelist-openrepo',
+		copypath: 'filelist-copypath',
 	},
 
 	search: {

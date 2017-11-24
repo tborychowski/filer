@@ -7,6 +7,7 @@ const actionMap = {
 	openfolder: () => $.trigger(EVENT.filelist.openfolder),
 	openterminal: () => $.trigger(EVENT.filelist.openterminal),
 	openrepo: () => $.trigger(EVENT.filelist.openrepo),
+	copypath: () => $.trigger(EVENT.filelist.copypath),
 };
 
 

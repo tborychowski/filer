@@ -79,6 +79,7 @@ const menuTemplate = [
 			option('Open Finder', 'CmdOrCtrl+O', EVENT.filelist.openfolder),
 			option('Open Terminal', 'CmdOrCtrl+T', EVENT.filelist.openterminal),
 			option('Open Git Repository', 'CmdOrCtrl+G', EVENT.filelist.openrepo),
+			option('Copy Path', 'CmdOrCtrl+L', EVENT.filelist.copypath),
 			{ type: 'separator' },
 
 

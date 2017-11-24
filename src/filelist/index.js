@@ -6,6 +6,12 @@ const FileList = require('./filelist');
 let flist;
 
 
+function copyPath () {
+	const dir = flist.getCurrentDir();
+	helper.copyToClipboard(dir);
+}
+
+
 function open (what) {
 	const dir = flist.getCurrentDir();
 	if (what === 'folder') helper.openFolder(dir);
@@ -146,6 +152,7 @@ function init () {
 	$.on(EVENT.filelist.openfolder, () => open('folder'));
 	$.on(EVENT.filelist.openterminal, () => open('terminal'));
 	$.on(EVENT.filelist.openrepo, () => open('repo'));
+	$.on(EVENT.filelist.copypath, copyPath);
 
 
 }
