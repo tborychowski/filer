@@ -12,7 +12,7 @@
     "postinstall": "electron-builder install-app-deps",
     "start": "electron index.js",
     "cp": "sudo rm -r /Applications/Filer.app/ ; sudo cp -R ./dist/mac/Filer.app /Applications/",
-    "build": "gulp build && build --mac && cp",
+    "build": "gulp build && build --mac && yarn cp",
     "release": "gulp build && build --mac --publish always"
   },
   "author": "Tom",
