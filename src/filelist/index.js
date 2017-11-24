@@ -9,6 +9,7 @@ let flist;
 function copyPath () {
 	const dir = flist.getCurrentDir();
 	helper.copyToClipboard(dir);
+	$.trigger(EVENT.toast.info, `Copied: <em>${dir}</em>`);
 }
 
 
@@ -19,6 +20,7 @@ function open (what) {
 	else if (what === 'repo') {
 		const url = Git.getRepoUrl(dir);
 		if (url) helper.openInBrowser(url);
+		else $.trigger(EVENT.toast.warning, 'This is not a Git repository');
 	}
 }
 

@@ -7,6 +7,7 @@ helper.init([
 	'palette',
 	'clipboard',
 	'toolbar',
+	'toast',
 
 	'filelist',	// should be last
 ]);

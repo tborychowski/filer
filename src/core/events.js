@@ -14,6 +14,12 @@ module.exports = {
 		changed: 'dir-changed'
 	},
 
+	toast: {
+		info: 'toast-info',
+		error: 'toast-error',
+		warning: 'toast-warning',
+	},
+
 	filelist: {
 		changed: 'filelist-changed',
 

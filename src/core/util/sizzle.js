@@ -35,6 +35,7 @@ sizzle.fn.eq = function (idx) { return sizzle(this[idx || 0]); };
 sizzle.fn.appendTo = function (parent) {
 	if (!this || !this.length) return this;
 	if (typeof parent === 'string') parent = sizzle(parent);
+	else if (!Array.isArray(parent)) parent = [parent];
 	parent[0].appendChild(this[0]);
 	return this;
 };

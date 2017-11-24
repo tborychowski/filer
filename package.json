@@ -11,8 +11,9 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "start": "electron index.js",
-    "build": "gulp build && build --mac",
-    "release": "build --mac --publish always"
+    "cp": "sudo rm -r /Applications/Filer.app/ ; sudo cp -R ./dist/mac/Filer.app /Applications/",
+    "build": "gulp build && build --mac && cp",
+    "release": "gulp build && build --mac --publish always"
   },
   "author": "Tom",
   "license": "MIT",
