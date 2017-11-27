@@ -11,12 +11,12 @@ function createWindow () {
 		title,
 		icon: __dirname + '/assets/icon.png',
 		show: false,
-		// titleBarStyle: 'hidden-inset',
 		x: mainWindowState.x,
 		y: mainWindowState.y,
 		width: mainWindowState.width,
 		height: mainWindowState.height,
-		titleBarStyle: 'hidden',
+		// titleBarStyle: 'hidden',
+		titleBarStyle: 'hidden-inset',
 	});
 	win.on('closed', () => win = null);
 	win.webContents.on('crashed', () => { win.destroy(); createWindow(); });

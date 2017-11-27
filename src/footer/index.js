@@ -1,10 +1,10 @@
-const { $, EVENT } = require('../core');
+const { $, EVENT, helper } = require('../core');
 const { Git } = require('../services');
 const _isEqual = require('lodash.isequal');
 
-
+const home = helper.homeDir;
 const separator = '<div class="footer-filler"></div>';
-let el;
+let el, title;
 let state = {
 	items: null,
 	git: null,
@@ -20,22 +20,22 @@ function getAllHtml () {
 
 function getFilteredHtml () {
 	const items = state.items && state.items.filtered || 0;
-	const all =  state.items && state.items.all || 0;
-	if (items >= all) return '';
+	// const all =  state.items && state.items.all || 0;
+	// if (items >= all) return '';
 	return `<div class="footer-stats-item" title="Filtered items">
 		<i class="fa fa-filter"></i>${items}</div>`;
 }
 
 function getSelectedHtml () {
 	const items = state.items && state.items.selected || 0;
-	if (!items) return '';
+	// if (!items) return '';
 	return `<div class="footer-stats-item" title="Selected items">
 		<i class="fa fa-check-square-o"></i>${items}</div>`;
 }
 
 function getCopiedHtml () {
-	const len = state.clip && state.clip.length;
-	if (!len) return '';
+	const len = state.clip && state.clip.length || 0;
+	// if (!len) return '';
 	return `<div class="footer-stats-item" title="Remembered items">
 		<i class="fa fa-files-o"></i>${len}</div>`;
 }
@@ -47,18 +47,19 @@ function getGitHtml () {
 	const status = state.git;
 	if (!status) return '';
 	const cls = (status.ahead || status.dirty || status.untracked) ? 'dirty' : 'clean';
-	return `<div class="footer-stats-item git-${cls}" title="Git status">
-		<i class="fa fa-code-fork"></i>${status.branch}</div>`;
+	return `<div class="footer-stats-item git-${cls}" title="Git status">(${status.branch})</div>`;
 }
 
 
 function render () {
-	el.html(getAllHtml() +
+	el.html(
+		getGitHtml() +
+		separator +
+		getAllHtml() +
 		getFilteredHtml() +
 		getSelectedHtml() +
-		getCopiedHtml() +
-		separator +
-		getGitHtml());
+		getCopiedHtml()
+	);
 }
 
 
@@ -93,6 +94,7 @@ function onListChanged (flist) {
 
 function onDirChanged (dir) {
 	updateState({ dir });
+	title.html(dir.replace(home, '~'));
 }
 
 function onClipboardChanged (clip) {
@@ -102,6 +104,7 @@ function onClipboardChanged (clip) {
 
 function init () {
 	el = $('.footer-stats');
+	title = $('.title');
 
 	$.on(EVENT.filelist.changed, onListChanged);
 	$.on(EVENT.dir.changed, onDirChanged);					// update git status

@@ -8,8 +8,8 @@ header
 	-webkit-app-region drag
 	height header-h
 	display flex
-	flex-flow column
-	padding 0 10px
+	align-items center
+	padding 0 10px 0 100px
 	box-shadow 0 0.5px 0 #f5f4f5 inset
 	background-color #e8e6e8
 	background-image linear-gradient(to bottom, #e8e6e8 0, #d1cfd1 100%)
@@ -17,17 +17,92 @@ header
 	color #555
 
 
-.title
-	margin 0
+
+.toolbar
+	height 100%
+	display flex
+	flex 1
+	padding 8px 0 6px
+
+
+
+.toolbar-btn
+.filelist-input
 	font inherit
-	text-align center
-	height 18px
-	margin 3px 52px
-	white-space nowrap
-	overflow hidden
-	text-overflow ellipsis
+	font-size 13px
+	border-radius 4px
+	border 0.5px solid rgba(#444, 0.3)
+	border-color #c2c0c2 #c2c0c2 #a19fa1
+	padding 0 10px 2px
+	color inherit
+	background-color rgba(#fff, 0.95)
+	background linear-gradient(#FCFCFC, #F5F4F5)
+	box-shadow: 0 0.5px 0.5px rgba(0, 0, 0, .06)
 
 
-.inactive header
-	background #F6F6F6
-	color #aaa
+
+.filelist-input
+	&::placeholder
+		color #ccc
+		text-align center
+
+	&:focus
+		&::placeholder
+			color #fff
+
+
+
+.toolbar-filler
+	flex 1
+
+
+.toolbar-btn
+	margin-right 10px
+	min-width 42px
+
+	&:focus
+		outline none
+
+	&:active
+		background-color #ececec
+
+
+	i
+		pointer-events none
+
+
+.toolbar-btn-group
+	display flex
+	margin-right 20px
+	border-radius 4px
+
+	.toolbar-btn
+		margin 0
+
+		& + .toolbar-btn
+			margin-left -1px
+			border-radius 0
+
+		&:first-child
+			border-radius 4px 0 0 4px
+
+		&:last-child
+			border-radius 0 4px 4px 0
+
+		&:active
+		&:focus
+			z-index 10
+
+
+
+
+.inactive
+	header
+		background #F6F6F6
+		color #aaa
+
+	.toolbar-btn
+	.filelist-input
+		box-shadow none
+		border-color #DBDBDB
+

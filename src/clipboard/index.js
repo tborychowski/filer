@@ -48,8 +48,12 @@ function get () {
 
 function save (data = []) {
 	data = data.map(i => i.path);
+	const len = data.length;
 	$.trigger(EVENT.clipboard.changed, data);					// early - to avoid visual delay in footer
-	if (data.length) copyFilesToClipboard(data);
+	if (len) {
+		copyFilesToClipboard(data);
+		$.trigger(EVENT.toast.info, `Copied: <em>${len}</em> item${len > 1 ? 's' : ''}`);
+	}
 }
 
 

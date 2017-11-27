@@ -6,7 +6,6 @@ helper.init([
 	'footer',
 	'palette',
 	'clipboard',
-	'toolbar',
 	'toast',
 
 	'filelist',	// should be last
