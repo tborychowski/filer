@@ -27,15 +27,18 @@ function open (what) {
 
 function copy (e) {
 	if (flist.getMode() !== 'nav') return;
-	e.preventDefault();
+	if (e) e.preventDefault();
 	let items = flist.getSelectedItems();
-	if (!items.length) items = [flist.getHighlightedItem()];
+	if (!items.length) {
+		const item = flist.getHighlightedItem();
+		if (item.name !== '..') items = [item];
+	}
 	if (items.length) Clipboard.save(items);
 }
 
 function paste (e) {
 	if (flist.getMode() !== 'nav') return;
-	e.preventDefault();
+	if (e) e.preventDefault();
 	const clip = Clipboard.get();
 	const currentDir = flist.getCurrentDir();
 	Files.copy(clip, currentDir)

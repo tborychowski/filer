@@ -1,115 +1,53 @@
 const { $, EVENT, helper } = require('../core');
 const { Git } = require('../services');
-const _isEqual = require('lodash.isequal');
 
 const home = helper.homeDir;
-const separator = '<div class="footer-filler"></div>';
-let el, title;
-let state = {
-	items: null,
-	git: null,
-	clip: null
-};
-
-function getAllHtml () {
-	const items = state.items && state.items.all || 0;
-	return `<div class="footer-stats-item" title="All items">
-		<i class="fa fa-file-o"></i>${items}</div>`;
-}
-
-
-function getFilteredHtml () {
-	const items = state.items && state.items.filtered || 0;
-	// const all =  state.items && state.items.all || 0;
-	// if (items >= all) return '';
-	return `<div class="footer-stats-item" title="Filtered items">
-		<i class="fa fa-filter"></i>${items}</div>`;
-}
-
-function getSelectedHtml () {
-	const items = state.items && state.items.selected || 0;
-	// if (!items) return '';
-	return `<div class="footer-stats-item" title="Selected items">
-		<i class="fa fa-check-square-o"></i>${items}</div>`;
-}
-
-function getCopiedHtml () {
-	const len = state.clip && state.clip.length || 0;
-	// if (!len) return '';
-	return `<div class="footer-stats-item" title="Remembered items">
-		<i class="fa fa-files-o"></i>${len}</div>`;
-}
+let el, gitEl, titleEl, hlItem;
 
 
 
 // { branch: 'master', ahead: 0, dirty: 9, untracked: 1, stashes: 0 }
-function getGitHtml () {
-	const status = state.git;
-	if (!status) return '';
-	const cls = (status.ahead || status.dirty || status.untracked) ? 'dirty' : 'clean';
-	return `<div class="footer-stats-item git-${cls}" title="Git status">(${status.branch})</div>`;
-}
-
-
-function render () {
-	el.html(
-		getGitHtml() +
-		separator +
-		getAllHtml() +
-		getFilteredHtml() +
-		getSelectedHtml() +
-		getCopiedHtml()
-	);
-}
-
-
-
-function updateGitStatus () {
-	state.gitStatus = null;
-	Git.status(state.dir).then(status => {
-		state.git = status;
-		render();
+function updateGitStatus (dir) {
+	Git.status(dir).then(status => {
+		let cls = '', branch = '';
+		if (status) {
+			cls = (status.ahead || status.dirty || status.untracked) ? 'dirty' : 'clean';
+			branch = `(${status.branch})`;
+		}
+		gitEl.removeClass('dirty clean');
+		gitEl.html(branch);
+		if (cls) gitEl.addClass(cls);
 	});
-}
-
-
-function updateState (updates) {
-	const newState = Object.assign({}, state, updates);
-	if (!_isEqual(state, newState)) state = newState;
-	if (updates.dir) updateGitStatus();
-	else render();
 }
 
 
 
 function onListChanged (flist) {
 	if (!flist || !flist.getItems().length) return;
-	const items = {
-		all: flist.getItems().length,
-		filtered: flist.getFilteredItems().length,
-		selected: flist.getSelectedItems().length,
-	};
-	updateState({ items });
+	const item = flist.getHighlightedItem();
+	hlItem.text(`${item.name}`);
 }
+
+
 
 function onDirChanged (dir) {
-	updateState({ dir });
-	title.html(dir.replace(home, '~'));
+	updateGitStatus(dir);
+	titleEl.html(dir.replace(home, '~'));
 }
 
-function onClipboardChanged (clip) {
-	state.clip = clip;
-	updateState({ clip });
-}
+
 
 function init () {
-	el = $('.footer-stats');
-	title = $('.title');
+	el = $('footer');
+	titleEl = el.find('.title');
+	gitEl = el.find('.git-status');
+	hlItem = el.find('.highlighted-item');
 
-	$.on(EVENT.filelist.changed, onListChanged);
+
 	$.on(EVENT.dir.changed, onDirChanged);					// update git status
-	$.on(EVENT.clipboard.changed, onClipboardChanged);
+	$.on(EVENT.filelist.changed, onListChanged);
 }
+
 
 module.exports = {
 	init

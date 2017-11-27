@@ -1,6 +1,7 @@
 const { $, EVENT } = require('../core');
 
-let el;
+let el, btnPaste, btnPasteText;
+
 const actionMap = {
 	newfolder: () => $.trigger(EVENT.filelist.newfolder),
 	newfile: () => $.trigger(EVENT.filelist.newfile),
@@ -8,6 +9,8 @@ const actionMap = {
 	openterminal: () => $.trigger(EVENT.filelist.openterminal),
 	openrepo: () => $.trigger(EVENT.filelist.openrepo),
 	copypath: () => $.trigger(EVENT.filelist.copypath),
+	copy: () => $.trigger(EVENT.filelist.copy),
+	paste: () => $.trigger(EVENT.filelist.paste),
 };
 
 
@@ -21,9 +24,25 @@ function onClick (e) {
 }
 
 
+
+function onClipboardChanged (clip) {
+	const len = clip && clip.length || 0;
+	btnPaste[0].disabled = !len;
+	btnPasteText.text(len ? len : '');
+}
+
+
+
+
 function init () {
 	el = $('.toolbar');
+
+	btnPaste = el.find('.btn-paste');
+	btnPasteText = btnPaste.find('span');
+
 	el.on('click', onClick);
+
+	$.on(EVENT.clipboard.changed, onClipboardChanged);
 }
 
 

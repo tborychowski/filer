@@ -34,7 +34,7 @@ function check () {
 
 function clipboardFull (data) {
 	clip = data;
-	$.trigger(EVENT.clipboard.changed, clip);					// realistically - to reflect the actual state
+	$.trigger(EVENT.clipboard.changed, clip, 'real');			// real - to reflect the actual state
 	$.trigger(EVENT.clipboard[data.length ? 'full' : 'empty']);	// for visual changes in mainmenu
 }
 
@@ -49,7 +49,7 @@ function get () {
 function save (data = []) {
 	data = data.map(i => i.path);
 	const len = data.length;
-	$.trigger(EVENT.clipboard.changed, data);					// early - to avoid visual delay in footer
+	$.trigger(EVENT.clipboard.changed, data, 'early');		// early - to avoid visual delay in footer
 	if (len) {
 		copyFilesToClipboard(data);
 		$.trigger(EVENT.toast.info, `Copied: <em>${len}</em> item${len > 1 ? 's' : ''}`);

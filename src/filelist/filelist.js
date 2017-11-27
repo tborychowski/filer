@@ -54,7 +54,7 @@ FileList.prototype.render = function () {
 
 FileList.prototype.updateList = function (highlightDir) {
 	this.list.innerHTML = this.getItemsHtml();
-	return this.highlight(highlightDir).triggerEvent('change');
+	return this.highlight(highlightDir);
 };
 
 
@@ -334,7 +334,7 @@ FileList.prototype.selectItem = function () {
 		this.data.selected.push(item);
 		el.classList.add('selected');
 	}
-	return this.triggerEvent('change').down();
+	return this.down();
 };
 
 
@@ -366,7 +366,7 @@ FileList.prototype.highlight = function (name) {
 		el.classList.add('highlighted');
 		el.scrollIntoViewIfNeeded();
 	}
-	return this;
+	return this.triggerEvent('change');
 };
 
 
