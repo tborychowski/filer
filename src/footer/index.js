@@ -25,7 +25,7 @@ function updateGitStatus (dir) {
 function onListChanged (flist) {
 	if (!flist || !flist.getItems().length) return;
 	const item = flist.getHighlightedItem();
-	hlItem.text(`${item.name}`);
+	hlItem.text(`${item && item.name || ''}`);
 }
 
 

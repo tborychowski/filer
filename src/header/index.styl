@@ -1,43 +1,43 @@
 @require '_lib'
 
 header
+	-webkit-app-region drag
 	position absolute
 	left 0
 	right 0
 	top 0
-	-webkit-app-region drag
-	height header-h
+	height (header-h * 2)
 	display flex
-	align-items center
-	padding 0 10px 0 100px
+	padding 16px 20px 12px 200px
 	box-shadow 0 0.5px 0 #f5f4f5 inset
 	background-color #e8e6e8
 	background-image linear-gradient(to bottom, #e8e6e8 0, #d1cfd1 100%)
-	border-bottom 0.5px solid #c2c0c2
+	border-bottom 1px solid #bbb
 	color #555
 
-
-
-.toolbar
-	height 100%
-	display flex
-	flex 1
-	padding 8px 0 6px
-
+	// hairline
+	width 200%
+	transform scale(.5)
+	transform-origin 0 0
 
 
 .toolbar-btn
 .filelist-input
 	font inherit
-	font-size 13px
-	border-radius 4px
-	border 0.5px solid rgba(#444, 0.3)
-	border-color #c2c0c2 #c2c0c2 #a19fa1
-	padding 0 10px 2px
+	border-radius 8px
 	color inherit
 	background-color rgba(#fff, 0.95)
 	background linear-gradient(#FCFCFC, #F5F4F5)
-	box-shadow: 0 2.5px 0 -2px rgba(0, 0, 0, .09)
+	box-shadow 0 1.5px 0 -1px rgba(0,0,0,0.1)
+	display flex
+	justify-content center
+	align-items center
+	border 1px solid rgba(#444, 0.3)
+	border-color #c2c0c2 #c2c0c2 #a19fa1
+	font-size 26px
+	padding 0 20px
+	letter-spacing 1px
+
 
 
 	&[disabled]
@@ -51,7 +51,7 @@ header
 
 	&:focus
 		&::placeholder
-			color #fff
+			color transparent
 
 
 
@@ -71,28 +71,36 @@ header
 
 
 	i
+	span
 		pointer-events none
+
+	span
+		font-size 25px
+		line-height 1
+
+		&:not(:empty)
+			margin 0 4px 0 10px
 
 
 .toolbar-btn-group
 	display flex
 	margin-right 20px
-	border-radius 4px
+	border-radius 8px
 
 	.toolbar-btn
 		margin 0
 		border-radius 0
 
 		& + .toolbar-btn
-			margin-left -1px
+			margin-left -2px
 
 		&:first-child
-			border-top-left-radius 4px
-			border-bottom-left-radius 4px
+			border-top-left-radius 8px
+			border-bottom-left-radius 8px
 
 		&:last-child
-			border-top-right-radius 4px
-			border-bottom-right-radius 4px
+			border-top-right-radius 8px
+			border-bottom-right-radius 8px
 
 
 		&:active
