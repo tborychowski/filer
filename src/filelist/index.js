@@ -160,6 +160,9 @@ function init () {
 	$.on(EVENT.filelist.copypath, copyPath);
 
 
+	$.on(EVENT.commandpalette.show, () => flist.setMode('palette'));
+	$.on(EVENT.commandpalette.hide, () => flist.setMode());
+
 }
 
 

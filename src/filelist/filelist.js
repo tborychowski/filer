@@ -409,6 +409,10 @@ FileList.prototype.getMode = function () {
 	return this.state.mode;
 };
 
+FileList.prototype.setMode = function (mode = 'nav') {
+	this.state.mode = mode;
+};
+
 
 FileList.prototype.getNextName = function (itemName = 'Folder') {
 	const items = this.getItems().map(i => i.name);
