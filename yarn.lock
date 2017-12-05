@@ -368,6 +368,12 @@ braces@^1.8.2:
     preserve "^0.2.0"
     repeat-element "^1.1.2"
 
+bson@0.2.x:
+  version "0.2.22"
+  resolved "https://registry.yarnpkg.com/bson/-/bson-0.2.22.tgz#fcda103f26d0c074d5a52d50927db80fd02b4b39"
+  dependencies:
+    nan "~1.8"
+
 builder-util-runtime@1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/builder-util-runtime/-/builder-util-runtime-1.0.5.tgz#7f2c3eb285230ae60c34f360a9235b08af88f519"
@@ -2279,6 +2285,10 @@ lodash@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-1.0.2.tgz#8f57560c83b59fc270bd3d561b690043430e2551"
 
+lodash@~4.11.x:
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.11.2.tgz#d6b4338b110a58e21dae5cebcfdbbfd2bc4cdb3b"
+
 longest@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/longest/-/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
@@ -2464,6 +2474,10 @@ multipipe@^0.1.2:
 nan@2, nan@^2.3.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
+
+nan@~1.8:
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-1.8.4.tgz#3c76b5382eab33e44b758d2813ca9d92e9342f34"
 
 natives@^1.1.0:
   version "1.1.0"
@@ -3164,6 +3178,10 @@ safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "http://build-npm.mo.sap.corp:8080/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
 
+safe@~0.3.9:
+  version "0.3.9"
+  resolved "https://registry.yarnpkg.com/safe/-/safe-0.3.9.tgz#178159bee45791ac21628aee2dabb74a52d5d072"
+
 sanitize-filename@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/sanitize-filename/-/sanitize-filename-1.6.1.tgz#612da1c96473fa02dccda92dcd5b4ab164a6772a"
@@ -3530,6 +3548,15 @@ timers-ext@^0.1.2:
   dependencies:
     es5-ext "~0.10.14"
     next-tick "1"
+
+tingodb@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/tingodb/-/tingodb-0.5.1.tgz#53cae52cb4d431080898cc19fc5d04333a0301c9"
+  dependencies:
+    lodash "~4.11.x"
+    safe "~0.3.9"
+  optionalDependencies:
+    bson "0.2.x"
 
 tough-cookie@~2.3.0, tough-cookie@~2.3.3:
   version "2.3.3"
