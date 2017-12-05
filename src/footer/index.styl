@@ -6,28 +6,25 @@ footer
 	right 0
 	bottom 0
 	z-index 100
-	font-size 26px
+	height footer-h
+	font-size 13px
 
 	display flex
 	background #eee
 	align-items center
 	padding 0 15px
 	justify-content space-between
-	border-top 1px solid #bbb
-	border-bottom 1px solid #ccc
-	box-shadow 0 1px 0 #f5f5f5 inset
 
-	height (footer-h * 2)
-	width 200%
-	transform scale(.5)
-	transform-origin 0 bottom
-	letter-spacing 1px
+	box-shadow 0 0.5px 0 #bbb inset,
+		0 1px 0 #f5f5f5 inset,
+		0 -0.5px 0 #ccc inset
 
 
 .footer-item
-	margin 0 3px
+	margin 0
 	white-space nowrap
-
+	overflow hidden
+	text-overflow ellipsis
 
 	&.dirty
 		color maroon
@@ -38,18 +35,21 @@ footer
 	i
 		margin-right 8px
 
+	&:empty
+		display none
+
 
 .footer-filler
 	flex 1
 
 
+// .git-status
 
 
-.title
-	margin 0
-	height initial
-	font inherit
-	text-align left
-	white-space nowrap
-	overflow hidden
-	text-overflow ellipsis
+.current-path
+	color #666
+
+
+.highlighted-item
+	font-weight 500
+	margin-left 2px

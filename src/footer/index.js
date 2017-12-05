@@ -2,7 +2,7 @@ const { $, EVENT, helper } = require('../core');
 const { Git } = require('../services');
 
 const home = helper.homeDir;
-let el, gitEl, titleEl, hlItem;
+let el, gitEl, pathEl, hlItem;
 
 
 
@@ -12,7 +12,7 @@ function updateGitStatus (dir) {
 		let cls = '', branch = '';
 		if (status) {
 			cls = (status.ahead || status.dirty || status.untracked) ? 'dirty' : 'clean';
-			branch = `(${status.branch})`;
+			branch = `${status.branch}`;
 		}
 		gitEl.removeClass('dirty clean');
 		gitEl.html(branch);
@@ -32,14 +32,14 @@ function onListChanged (flist) {
 
 function onDirChanged (dir) {
 	updateGitStatus(dir);
-	titleEl.html(dir.replace(home, '~'));
+	pathEl.html(dir.replace(home, '~') + '/');
 }
 
 
 
 function init () {
 	el = $('footer');
-	titleEl = el.find('.title');
+	pathEl = el.find('.current-path');
 	gitEl = el.find('.git-status');
 	hlItem = el.find('.highlighted-item');
 

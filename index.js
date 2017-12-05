@@ -15,7 +15,6 @@ function createWindow () {
 		y: mainWindowState.y,
 		width: mainWindowState.width,
 		height: mainWindowState.height,
-		// titleBarStyle: 'hidden',
 		titleBarStyle: 'hidden-inset',
 	});
 	win.on('closed', () => win = null);
