@@ -1,2 +1,62 @@
 @require '_lib'
 
+.command-palette
+	flex 1
+	display flex
+	flex-wrap wrap
+	min-width 200px
+	max-width 60%
+	position fixed
+	left 30%
+	right 30%
+	top 15%
+	background #fff
+	border-radius 4px
+	box-shadow 0 1px 5px rgba(#000, 0.3)
+
+.command-palette *
+	box-sizing border-box
+
+.command-palette-input
+	font inherit
+	width 100%
+	border none
+	padding 5px 11px
+	margin 10px 0
+	outline none
+
+
+.command-palette-list
+	position relative
+	width 100%
+	overflow-y auto
+	z-index 99
+	padding 10px 0
+	border-top 1px solid #ccc
+
+.command-palette-list:empty
+	padding 0
+
+
+.command-palette-list-item
+	padding 5px 20px
+	color #333
+	cursor pointer
+
+
+.command-palette-list-item:hover
+.command-palette-list-item.selected
+	background-color #2e69e2
+	color #fff
+
+
+
+.command-palette.hidden
+	display none
+
+
+.item-name
+	font-size 14px
+
+.item-sub
+	color #ccc

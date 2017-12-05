@@ -5,6 +5,12 @@ module.exports = {
 		empty: 'clipboard-empty',
 	},
 
+	commandpalette: {
+		action: 'commandpalette-action',
+		show: 'commandpalette-show',
+		hide: 'commandpalette-hide',
+	},
+
 	document: {
 		clicked: 'document-clicked',
 		keyup: 'document-keyup'

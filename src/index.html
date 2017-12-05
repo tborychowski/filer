@@ -9,29 +9,33 @@
 </head>
 <body>
 
-	<header>
-		<h1 class="title"></h1>
-		<div class="toolbar">
-			<div class="toolbar-btn-group">
-				<button class="toolbar-btn" data-action="newfolder" title="New Folder"><i class="fa fa-folder-o"></i></button>
-				<button class="toolbar-btn" data-action="newfile" title="New File"><i class="fa fa-file-o"></i></button>
-			</div>
-			<div class="toolbar-btn-group">
-				<button class="toolbar-btn" data-action="openfolder" title="Open Finder"><i class="fa fa-external-link"></i></button>
-				<button class="toolbar-btn" data-action="openterminal" title="Open Terminal"><i class="fa fa-terminal"></i></button>
-				<button class="toolbar-btn" data-action="openrepo" title="Open Git Repo"><i class="fa fa-git"></i></button>
-				<button class="toolbar-btn" data-action="copypath" title="Copy Path"><i class="fa fa-copy"></i></button>
-			</div>
-
-			<div class="toolbar-filler"></div>
-			<input class="filelist-input" placeholder="Filter">
+	<header class="toolbar">
+		<div class="toolbar-btn-group">
+			<button class="toolbar-btn" data-action="newfolder" title="New Folder"><i class="fa fa-folder-o"></i></button>
+			<button class="toolbar-btn" data-action="newfile" title="New File"><i class="fa fa-file-o"></i></button>
 		</div>
+		<div class="toolbar-btn-group">
+			<button class="toolbar-btn" data-action="openfolder" title="Open Finder"><i class="fa fa-external-link"></i></button>
+			<button class="toolbar-btn" data-action="openterminal" title="Open Terminal"><i class="fa fa-terminal"></i></button>
+			<button class="toolbar-btn" data-action="openrepo" title="Open Git Repo"><i class="fa fa-git"></i></button>
+			<button class="toolbar-btn" data-action="copypath" title="Copy Path"><i class="fa fa-compass"></i></button>
+		</div>
+		<div class="toolbar-btn-group">
+			<button class="toolbar-btn" data-action="copy" title="Copy"><i class="fa fa-copy"></i></button>
+			<button class="toolbar-btn btn-paste" data-action="paste" title="Paste" disabled><i class="fa fa-clipboard"></i><span></span></button>
+		</div>
+
+		<div class="toolbar-filler"></div>
+		<input class="filelist-input" placeholder="Filter">
 	</header>
 
 	<section class="filelist-wrapper"><div class="filelist"></div></section>
 
-	<footer class="statusbar">
-		<div class="footer-stats"></div>
+	<footer>
+		<h1 class="title"></h1>
+		<div class="footer-item git-status" title="Git status"></div>
+		<div class="footer-item highlighted-item"></div>
+		<div class="footer-filler"></div>
 	</footer>
 
 	<script src="index.js"></script>
