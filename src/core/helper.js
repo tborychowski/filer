@@ -116,6 +116,7 @@ function getWin () {
 
 function init (components, path = '../') {
 	document.title = appName;
+	components = [...new Set(components)];	// unique
 	components.forEach(c => {
 		const m = require(path + c);
 		if (m && m.init) m.init();

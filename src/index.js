@@ -4,7 +4,6 @@ helper.init([
 	'mainmenu',
 	'header',
 	'footer',
-	'palette',
 	'clipboard',
 	'toast',
 	'palette',

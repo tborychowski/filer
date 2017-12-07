@@ -243,15 +243,37 @@ CommandPalette.prototype.highlightFilter = function (q) {
 };
 
 
+CommandPalette.prototype.calcMatchScore = function (q) {
+	return item => {
+		item.score = 0;
+		q = q.toLowerCase();
+		if (this.config.searchInFields && q) {
+			this.config.searchInFields.forEach(f => {
+				const fld = item[f].toLowerCase();
+				if (fld === q) item.score += 10;
+				if (fld.indexOf(q) > -1) item.score += 5;
+			});
+		}
+		return item;
+	};
+};
+
+
 CommandPalette.prototype.filter = function () {
 	const q = this.input && this.input.value || '';
 	if (!this.data) return this;
-	if (!q) this.filteredData = Array.from(this.data);
+	if (!q) {
+		this.filteredData = Array.from(this.data)
+			.sort((a, b) => b.accessed_at - a.accessed_at)	// recent at top
+			.sort((a, b) => b.visited - a.visited);			// most visited to top
+	}
 	else {
-		const hlfilter = this.highlightFilter(q);
 		this.filteredData = this.data
 			.filter(this.filterFunction.bind(this, q))
-			.map(hlfilter);
+			.map(this.highlightFilter(q))
+			.map(this.calcMatchScore(q));
+
+		this.filteredData.sort((a, b) => b.score - a.score);
 	}
 	this.state.selectedIndex = (q && this.filteredData.length) ? 0 : -1;
 	return this;
@@ -312,6 +334,7 @@ CommandPalette.prototype.open = function () {
 	this.el.classList.remove('hidden');
 	this.state.open = true;
 	this.input.select();
+	this.load();
 	this.triggerEvent('show');
 	return this;
 };

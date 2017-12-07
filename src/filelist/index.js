@@ -158,6 +158,7 @@ function init () {
 	$.on(EVENT.filelist.openterminal, () => open('terminal'));
 	$.on(EVENT.filelist.openrepo, () => open('repo'));
 	$.on(EVENT.filelist.copypath, copyPath);
+	$.on(EVENT.filelist.goto, dir => flist.gotoDir(dir));
 
 
 	$.on(EVENT.commandpalette.show, () => flist.setMode('palette'));

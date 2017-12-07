@@ -27,6 +27,7 @@ module.exports = {
 	},
 
 	filelist: {
+		goto: 'filelist-goto',
 		changed: 'filelist-changed',
 
 		undo: 'filelist-undo',

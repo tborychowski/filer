@@ -2,11 +2,13 @@ const DB = require('./class.db');
 const db = new DB('history', 'path');
 
 
-function add (item = {}) {
+async function add (item = {}) {
 	if (!item) return Promise.resolve();
-	item.touched_at = +new Date();
-	item.visited = (item.visited || 0) + 1;
-	return db.addOrUpdate(item);
+
+	const oldItem = await db.findOne({ name: item.name, path: item.path });
+	item.visited = (oldItem && oldItem.visited || 0) + 1;
+
+	return db.addOrUpdate({path: item.path}, item);
 }
 
 
