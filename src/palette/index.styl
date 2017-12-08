@@ -2,28 +2,37 @@
 
 .command-palette
 	flex 1
-	display flex
 	flex-wrap wrap
 	min-width 200px
-	max-width 60%
+	max-width 80%
 	position fixed
-	left 30%
-	right 30%
+	left 20%
+	right 20%
 	top 15%
-	background #fff
 	border-radius 4px
+	display flex
 	box-shadow 0 0px 15px 5px rgba(#000, 0.3)
+	background #fff
+
+	// background rgba(#fff, 0.3)	// maybe some day when it works :-)
+	// backdrop-filter blur(10px)
+
+	&.hidden
+		display none
 
 .command-palette *
 	box-sizing border-box
 
 .command-palette-input
 	font inherit
+	font-size 16px
 	width 100%
 	border none
-	padding 5px 11px
-	margin 10px 0
+	padding 15px 11px
+	margin 0
 	outline none
+	background none
+	border-radius 4px 4px 0 0
 
 
 .command-palette-list
@@ -51,12 +60,9 @@
 
 
 
-.command-palette.hidden
-	display none
-
-
 .item-name
 	font-size 14px
 
 .item-sub
 	color #ccc
+

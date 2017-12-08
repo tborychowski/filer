@@ -1,5 +1,16 @@
 const className = 'command-palette';
 
+function animateElement (el, from, to, opts) {
+	const dflt = {duration: 50, easing: 'ease-out', fill: 'forwards'};
+	opts = Object.assign({}, dflt, opts);
+	return new Promise (resolve => {
+		const anim = el.animate([from, to], opts);
+		anim.oncancel = resolve;
+		anim.onfinish = resolve;
+	});
+}
+
+
 function CommandPalette (config) {
 	if (!(this instanceof CommandPalette)) return new CommandPalette(config);
 
@@ -329,9 +340,15 @@ CommandPalette.prototype.selectItem = function (item) {
 };
 
 
+
+
 CommandPalette.prototype.open = function () {
 	if (!this.filteredData.length || this.state.open) return this;
+	document.body.classList.add('comman-palette-visible');
+
 	this.el.classList.remove('hidden');
+	animateElement(this.el, {opacity: 0}, {opacity: 1});
+
 	this.state.open = true;
 	this.input.select();
 	this.load();
@@ -345,7 +362,12 @@ CommandPalette.prototype.close = function () {
 	this.clear();
 	this.state.open = false;
 	this.state.selectedIndex = -1;
-	this.el.classList.add('hidden');
+	document.body.classList.remove('comman-palette-visible');
+
+	animateElement(this.el, {opacity: 1}, {opacity: 0}, {duration: 100 })
+		.then(() => this.el.classList.add('hidden'));
+
+
 	this.triggerEvent('hide');
 	return this;
 };
