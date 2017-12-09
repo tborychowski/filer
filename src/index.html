@@ -15,10 +15,10 @@
 			<button class="toolbar-btn" data-action="newfile" title="New File"><i class="fa fa-file-o"></i></button>
 		</div>
 		<div class="toolbar-btn-group">
-			<button class="toolbar-btn" data-action="openfolder" title="Open Finder"><i class="fa fa-external-link"></i></button>
+			<!-- <button class="toolbar-btn" data-action="openfolder" title="Open Finder"><i class="fa fa-external-link"></i></button> -->
 			<button class="toolbar-btn" data-action="openterminal" title="Open Terminal"><i class="fa fa-terminal"></i></button>
-			<button class="toolbar-btn" data-action="openrepo" title="Open Git Repo"><i class="fa fa-git"></i></button>
-			<button class="toolbar-btn" data-action="copypath" title="Copy Path"><i class="fa fa-compass"></i></button>
+			<!-- <button class="toolbar-btn" data-action="openrepo" title="Open Git Repo"><i class="fa fa-git"></i></button> -->
+			<!-- <button class="toolbar-btn" data-action="copypath" title="Copy Path"><i class="fa fa-compass"></i></button> -->
 		</div>
 		<div class="toolbar-btn-group">
 			<button class="toolbar-btn" data-action="copy" title="Copy"><i class="fa fa-copy"></i></button>
@@ -32,10 +32,10 @@
 	<section class="filelist-wrapper"><div class="filelist"></div></section>
 
 	<footer>
-		<div class="footer-item current-path"></div>
+		<button class="footer-item current-path" data-action="openfolder" title="Open Finder"></button>
 		<div class="footer-item highlighted-item"></div>
 		<div class="footer-filler"></div>
-		<div class="footer-item git-status" title="Git status"></div>
+		<button class="footer-item git-status" data-action="openrepo" title="Open Git Repo"></button>
 	</footer>
 
 	<script src="index.js"></script>

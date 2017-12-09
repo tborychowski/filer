@@ -1,6 +1,6 @@
 const { $, EVENT } = require('../core');
 
-let el, btnPaste, btnPasteText;
+let btnPaste, btnPasteText;
 
 const actionMap = {
 	newfolder: () => $.trigger(EVENT.filelist.newfolder),
@@ -15,7 +15,7 @@ const actionMap = {
 
 
 function onClick (e) {
-	if (e.target.matches('.toolbar-btn')) {
+	if (e.target && e.target.dataset && e.target.dataset.action) {
 		const actionName = e.target.dataset.action;
 		if (!actionName) return;
 		const fn = actionMap[actionName];
@@ -35,12 +35,10 @@ function onClipboardChanged (clip) {
 
 
 function init () {
-	el = $('.toolbar');
-
-	btnPaste = el.find('.btn-paste');
+	btnPaste = $('.toolbar .btn-paste');
 	btnPasteText = btnPaste.find('span');
 
-	el.on('click', onClick);
+	document.addEventListener('click', onClick);
 
 	$.on(EVENT.clipboard.changed, onClipboardChanged);
 }

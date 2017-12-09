@@ -17,7 +17,6 @@ function createWindow () {
 		height: mainWindowState.height,
 		titleBarStyle: 'hidden-inset',
 		scrollBounce: true,
-		vibrancy: 'dark',
 		webPreferences: {
 			experimentalFeatures: true,
 			blinkFeatures: 'CSSBackdropFilter'

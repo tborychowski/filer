@@ -14,7 +14,7 @@ function animateElement (el, from, to, opts) {
 function CommandPalette (config) {
 	if (!(this instanceof CommandPalette)) return new CommandPalette(config);
 
-	const defaults = { valueField: 'name' };
+	const defaults = { valueField: 'name', maxItems: 10 };
 
 	this.input = null;
 	this.list = null;
@@ -67,6 +67,7 @@ CommandPalette.prototype.getItemHtml = function (i) {
 
 
 CommandPalette.prototype.getItemsHtml = function () {
+	this.filteredData = this.filteredData.slice(0, this.config.maxItems);
 	return this.filteredData.map(this.getItemHtml.bind(this)).join('');
 };
 
@@ -112,7 +113,7 @@ CommandPalette.prototype.updateList = function () {
 	const datlen = this.filteredData.length;
 	if (datlen) {
 		const itemH = this.getItemHeight();
-		let maxItems = this.config.maxItems || 10;
+		let maxItems = this.config.maxItems;
 		if (datlen && datlen < maxItems) maxItems = datlen;
 		h = itemH * maxItems + 20;
 	}

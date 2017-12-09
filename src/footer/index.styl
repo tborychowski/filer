@@ -22,9 +22,13 @@ footer
 
 .footer-item
 	margin 0
+	padding 0
 	white-space nowrap
 	overflow hidden
 	text-overflow ellipsis
+	border none
+	background none
+	font inherit
 
 	&.dirty
 		color maroon
@@ -37,6 +41,11 @@ footer
 
 	&:empty
 		display none
+
+	button&:hover
+		text-decoration underline
+		cursor pointer
+
 
 
 .footer-filler

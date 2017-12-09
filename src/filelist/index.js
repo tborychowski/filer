@@ -128,9 +128,9 @@ function init () {
 			$.trigger(EVENT.dir.changed, path);
 		})
 		.on('newItem', newItem)
-		.on('rename', rename)
-		.start();
+		.on('rename', rename);
 
+	setTimeout(() => flist.start(), 300);
 
 	Files.onChange(reloadAfterDelete);
 
@@ -163,7 +163,6 @@ function init () {
 
 	$.on(EVENT.commandpalette.show, () => flist.setMode('palette'));
 	$.on(EVENT.commandpalette.hide, () => flist.setMode());
-
 }
 
 

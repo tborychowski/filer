@@ -353,14 +353,20 @@ FileList.prototype.unselectAll = function () {
 	return this.triggerEvent('change');
 };
 
+
+FileList.prototype.removeHighlight = function () {
+	this.list
+		.querySelectorAll('.filelist-item')
+		.forEach(i => { i.classList.remove('highlighted'); });
+};
+
+
 FileList.prototype.highlight = function (name) {
 	let idx = this.state.highlightedIndex;
 	if (name) idx = this.data.filtered.findIndex(item => item.name === name);
 	if (idx === -1) idx = 0;
 	this.state.highlightedIndex = idx;
-	this.list
-		.querySelectorAll('.filelist-item')
-		.forEach(i => { i.classList.remove('highlighted'); });
+	this.removeHighlight();
 	const el = this.getElFromIdx(idx);
 	if (el) {
 		el.classList.add('highlighted');
@@ -411,6 +417,8 @@ FileList.prototype.getMode = function () {
 
 FileList.prototype.setMode = function (mode = 'nav') {
 	this.state.mode = mode;
+	if (mode !== 'nav') this.removeHighlight();
+	else this.highlight();
 };
 
 
