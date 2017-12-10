@@ -34,6 +34,7 @@
     "fs-extra": "^4.0.2",
     "git-state": "^4.0.0",
     "javascript-natural-sort": "^0.7.1",
+    "json5": "^0.5.1",
     "lodash.get": "^4.4.2",
     "mousetrap": "^1.6.1",
     "nodobjc": "^2.1.0",
