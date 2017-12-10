@@ -70,13 +70,13 @@ FileList.prototype.getItemHtml = function (i) {
 	cls.push(i.name === '..' ? 'unselectable' : 'selectable');
 	const name = i.highlighted ? i.highlighted.basename : i.basename;
 	const ext = i.highlighted ? i.highlighted.ext : i.ext;
-	const size = i.size ? `${i.size}`: '';
+	// const size = i.size ? `${i.size}`: '';
 	return `<div class="${cls.join(' ')}" data-id="${id}">
 			<i class="file-icon ${i.iconClass}"></i>
 			<span class="file-name">${name}</span>
 			<span class="file-ext">${ext || ''}</span>
-			<span class="file-size">${size}</span>
 		</div>`;
+	// <span class="file-size">${size}</span>
 };
 
 

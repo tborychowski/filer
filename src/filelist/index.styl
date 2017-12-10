@@ -13,7 +13,7 @@
 	-webkit-overflow-scrolling touch
 
 
-.comman-palette-visible	.filelist-wrapper
+.command-palette-visible .filelist-wrapper
 	filter brightness(80%)
 
 
@@ -34,34 +34,38 @@
 		content "\f00c"
 		color #95c095
 
-.filelist-item.highlighted
-	background-color #256BD2
-	color #fff
-
-
-.file-name
-	flex 1
-
-.file-ext
-	color #ccc
-	margin-left 5px
-	min-width 80px
-	text-align right
-
-.file-size
-	color #ccc
-	margin-left 5px
-	min-width 90px
-	text-align right
-
 .file-icon
 	font-size 22px
 	width 22px
 	height 22px
 	margin-right 10px
-	color #ccc
+	color #bbb
 	font-style normal
 	text-align center
+
+
+.file-name
+	color #222
+// 	flex 1
+
+.file-ext
+	color #bbb
+	margin-left 1px
+	text-align right
+
+// .file-size
+// 	color #ccc
+// 	margin-left 5px
+// 	min-width 90px
+// 	text-align right
+
+
+.filelist-item.highlighted
+	background-color #256BD2
+
+	.file-name
+		color #fff
+
 
 
 .filelist-edit-input

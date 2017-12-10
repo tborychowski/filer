@@ -345,7 +345,7 @@ CommandPalette.prototype.selectItem = function (item) {
 
 CommandPalette.prototype.open = function () {
 	if (!this.filteredData.length || this.state.open) return this;
-	document.body.classList.add('comman-palette-visible');
+	document.body.classList.add(`${className}-visible`);
 
 	this.el.classList.remove('hidden');
 	animateElement(this.el, {opacity: 0}, {opacity: 1});
@@ -363,7 +363,7 @@ CommandPalette.prototype.close = function () {
 	this.clear();
 	this.state.open = false;
 	this.state.selectedIndex = -1;
-	document.body.classList.remove('comman-palette-visible');
+	document.body.classList.remove(`${className}-visible`);
 
 	animateElement(this.el, {opacity: 1}, {opacity: 0}, {duration: 100 })
 		.then(() => this.el.classList.add('hidden'));
