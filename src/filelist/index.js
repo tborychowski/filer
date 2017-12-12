@@ -2,6 +2,7 @@ const { $, EVENT, helper, dialog, config } = require('../core');
 const { Files, Git } = require('../services');
 const Clipboard = require('../clipboard');
 const FileList = require('./filelist');
+const Settings = require('../settings');
 
 let flist;
 
@@ -116,10 +117,13 @@ function del () {
 
 
 function init () {
+	const settings = Settings.get();
+	let startDir = config.get('currentDir') || helper.homeDir;
+	if (settings.startDir && settings.startDir !== 'auto') startDir = settings.startDir;
+
 	flist = FileList({
 		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),
-		dir: config.get('currentDir') || helper.homeDir,
-		pathSeparator: helper.pathSep,
+		dir: startDir, pathSeparator: helper.pathSep,
 	})
 		.on('openFile', path => helper.openFile(path))
 		.on('change', () => $.trigger(EVENT.filelist.changed, flist))

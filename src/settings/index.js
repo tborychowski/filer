@@ -1,23 +1,31 @@
 const { $, EVENT, helper } = require('../core');
+const { Files } = require('../services');
 const FS = require('fs-extra');
 const file = `${helper.getUserDataFolder()}/filer-settings.js`;
 const JSON5 = require('json5');
 
 const defaults = {
-	startupDir: 'auto', // or fixed dir
-	openDirInExternalApp: [
-		{ name: 'Terminal', icon: 'fa-terminal', cmd: 'open -a Terminal', params: '$dir' }
+	startDir: 'auto', // or fixed dir
+	customButtons: [
+		{ name: 'Terminal', icon: 'fa-terminal', cmd: 'open -a Terminal $dir' }
 	]
 };
 
 
 function purgeSettings () {
-
+	FS.removeSync(file);
+	writeDefaultSettings();
 }
+
 
 function writeDefaultSettings () {
 	FS.writeFileSync(file, JSON5.stringify(defaults, null, '\t'));
 	return defaults;
+}
+
+
+function onSettingsUpdated () {
+	$.trigger(EVENT.settings.updated);
 }
 
 
@@ -28,6 +36,10 @@ function get () {
 
 function init () {
 	if (!FS.pathExistsSync(file)) return writeDefaultSettings();
+
+	const watcher = Files.FileWatcher(file);
+	watcher.on('change', onSettingsUpdated);
+
 
 	$.on(EVENT.settings.show, () => helper.openFile(file));
 	$.on(EVENT.settings.purge, purgeSettings);

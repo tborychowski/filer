@@ -17,12 +17,12 @@ const appId = getPackage('name');
 const appName = getPackage('productName', app.getName());
 const appRepoUrl = parseGitUrl(getPackage('repository.url'));
 
-
 const getOpenBrowserCmd = (browser, url) => ({
 	darwin: `open -a "${browser}" "${url}"`,
 	win32: `"${browser}" "${url}"`,
 	linux: `"${browser}" "${url}"`
 }[process.platform]);
+
 
 function openInBrowser (url) {
 	const browser = config.get('browser');
@@ -39,6 +39,15 @@ function openInTerminal (dir) {
 	});
 }
 
+
+function run (cmd) {
+	return new Promise((resolve, reject) => {
+		exec(cmd, (err, stdout, stderr) => {
+			if (err || stderr) reject(err || stderr);
+			else resolve(stdout);
+		});
+	});
+}
 
 function getPackage (key, dflt = '') {
 	if (!pckg) {
@@ -150,5 +159,6 @@ module.exports = {
 	quicklook,
 	homeDir,
 	pathSep,
+	run,
 	init
 };

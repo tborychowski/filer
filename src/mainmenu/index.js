@@ -93,8 +93,8 @@ const menuTemplate = [
 		label: 'Dev',
 		submenu: [
 			{ role: 'toggledevtools' },
-			// { type: 'separator' },
-			// option('Purge Settings & Caches', 'CmdOrCtrl+Shift+Backspace', EVENT.settings.purge),
+			{ type: 'separator' },
+			option('Purge Settings & Caches', 'CmdOrCtrl+Shift+Backspace', EVENT.settings.purge),
 		]
 	},
 	{

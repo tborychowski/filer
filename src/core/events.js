@@ -64,5 +64,6 @@ module.exports = {
 		show: 'settings-show',
 		hide: 'settings-hide',
 		purge: 'settings-purge',
+		updated: 'settings-updated',
 	}
 };
