@@ -44,6 +44,42 @@ const watcher = {
 
 
 
+function FileWatcher (file) {
+	if (!(this instanceof FileWatcher)) return new FileWatcher(file);
+	this.watcher = Chokidar.watch(file, watcher.options);
+	this.watcher.on('raw', (event) => {
+		if (event === 'modified') this.triggerEvent('change');
+	});
+	this.eventListeners = { change: [] };
+	return this;
+}
+
+
+FileWatcher.prototype.on = function (event, cb) {
+	if (!this.eventListeners[event]) throw new Error(`Event doesnt exist: ${event}`);
+	this.eventListeners[event].push(cb);
+	return this;
+};
+
+FileWatcher.prototype.triggerEvent = function (event, ...params) {
+	if (this.eventListeners[event]) {
+		this.eventListeners[event].forEach(cb => { cb.apply(cb, params); });
+	}
+	return this;
+};
+
+
+FileWatcher.prototype.stop = function () {
+	this.watcher.close();
+};
+
+
+
+
+
+
+
+
 function findFileIcon (ext = '') {
 	ext = ext.toLowerCase().substr(1);
 	if (FileExtMap[ext]) return `file-${FileExtMap[ext]}-o`;
@@ -107,6 +143,7 @@ function addFolderUp (parentPath, fileList) {
 
 
 function readDir (path, options) {
+	watcher.start(path);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
@@ -191,4 +228,5 @@ module.exports = {
 	copy,
 	move,
 	onChange,
+	FileWatcher,
 };

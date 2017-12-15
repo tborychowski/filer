@@ -8,6 +8,7 @@ helper.init([
 	'toast',
 	'palette',
 	'filelist',
+	'settings',
 ]);
 
 

@@ -44,7 +44,7 @@ function init () {
 	hlItem = el.find('.highlighted-item');
 
 
-	$.on(EVENT.dir.changed, onDirChanged);					// update git status
+	$.on(EVENT.dir.changed, onDirChanged);
 	$.on(EVENT.filelist.changed, onListChanged);
 }
 
