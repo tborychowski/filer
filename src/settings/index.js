@@ -30,7 +30,13 @@ function onSettingsUpdated () {
 
 
 function get () {
-	return JSON5.parse(FS.readFileSync(file));
+	try {
+		const json = FS.readFileSync(file);
+		return JSON5.parse(json);
+	}
+	catch (e) {
+		return {};
+	}
 }
 
 

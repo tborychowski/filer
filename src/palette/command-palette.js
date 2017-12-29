@@ -85,6 +85,14 @@ CommandPalette.prototype.render = function () {
 	this.el = document.querySelector(`.${className}`);
 	this.input = this.el.querySelector(`.${className}-input`);
 	this.list = this.el.querySelector(`.${className}-list`);
+
+	if (this.config.sizeContainer) {
+		if (typeof this.config.sizeContainer === 'string') {
+			this.sizeContainer = document.querySelector(this.config.sizeContainer);
+		}
+		else this.sizeContainer = this.config.sizeContainer;
+	}
+	else this.sizeContainer = document.body;
 	this.state.rendered = true;
 	return this;
 };
@@ -116,6 +124,14 @@ CommandPalette.prototype.updateList = function () {
 		let maxItems = this.config.maxItems;
 		if (datlen && datlen < maxItems) maxItems = datlen;
 		h = itemH * maxItems + 20;
+
+		// reduce height if it doesn't fit
+		if (this.sizeContainer) {
+			const containerSizeH = this.sizeContainer.getBoundingClientRect().height;
+			const listSizeTop = this.list.getBoundingClientRect().top;
+			const actualH = h + listSizeTop;
+			if (actualH > containerSizeH) h = containerSizeH - listSizeTop;
+		}
 	}
 	this.list.style.height = `${h}px`;
 
@@ -138,8 +154,9 @@ CommandPalette.prototype.initEvents = function () {
 
 CommandPalette.prototype.onDocumentKeyDown = function (e) {
 	if (e.key === 'p' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
-		this.open();
 		e.preventDefault();
+		if (this.state.open) this.close();
+		else this.open();
 	}
 };
 

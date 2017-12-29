@@ -29,6 +29,7 @@ function init () {
 	const palette = new CommandPalette({
 		searchInFields: ['name', 'path'],
 		dataSrc: () => History.get(),
+		sizeContainer: '.filelist-wrapper',
 		itemRenderer: ({name, path, highlighted}) => {
 			if (highlighted) {
 				if (highlighted.name) name = highlighted.name;
