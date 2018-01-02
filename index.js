@@ -10,7 +10,7 @@ function createWindow () {
 	win = new BrowserWindow({
 		title,
 		icon: __dirname + '/assets/icon.png',
-		show: true,
+		show: false,
 		x: mainWindowState.x,
 		y: mainWindowState.y,
 		width: mainWindowState.width,
@@ -23,7 +23,6 @@ function createWindow () {
 		}
 	});
 
-	console.log('create window');
 	win.on('closed', () => win = null);
 	win.webContents.on('crashed', () => {
 		win.destroy();
