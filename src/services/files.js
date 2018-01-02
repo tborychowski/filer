@@ -81,7 +81,6 @@ function addFolderUp (parentPath, fileList) {
 
 
 function readDir (path, options) {
-	// watcher.start(path);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
