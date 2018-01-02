@@ -12,7 +12,6 @@ function status (path) {
 	if (!path) return Promise.resolve();
 	return new Promise (resolve => {
 		git.check(path, (err, result) => {
-			if (err) resolve();
 			resolve(result);
 		});
 	});

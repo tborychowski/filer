@@ -22,8 +22,12 @@ function createWindow () {
 			blinkFeatures: 'CSSBackdropFilter'
 		}
 	});
+
 	win.on('closed', () => win = null);
-	win.webContents.on('crashed', () => { win.destroy(); createWindow(); });
+	win.webContents.on('crashed', () => {
+		win.destroy();
+		createWindow();
+	});
 
 	mainWindowState.manage(win);
 
@@ -34,7 +38,6 @@ function createWindow () {
 	win.once('ready-to-show', () => win.show());
 	win.on('blur', () => send('window', 'blur'));
 	win.on('focus', () => send('window', 'focus'));
-
 }
 
 app.on('window-all-closed', app.quit);

@@ -32,7 +32,9 @@ function onListChanged (flist) {
 
 function onDirChanged (dir) {
 	updateGitStatus(dir);
-	pathEl.html(dir.replace(home, '~') + '/');
+	pathEl.text(dir.replace(home, '~') + '/');
+	// clear, so it doesn't show the old before onListChanged updates it
+	hlItem.text('');
 }
 
 

@@ -4,8 +4,6 @@ const Path = require('path');
 const PrettyBytes = require('pretty-bytes');
 const Copy = require('recursive-copy');
 const FileExtMap = require('./file-ext-map.js');
-const Chokidar = require('chokidar');
-
 
 const naturalSort = require('javascript-natural-sort');
 const { helper } = require('../core');
@@ -18,66 +16,6 @@ let CASE_SENSITIVE = false;	// for sorting
 
 // /some/long/path => /some/long
 const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
-
-
-// Monitors for file-system changes (to reload the file-list)
-const watcher = {
-	instance: null,
-	onChangeCallback: () => {},
-	options: {
-		depth: 0,
-		disableGlobbing: true,
-		ignoreInitial: true,
-		followSymlinks: false,
-	},
-	start: (dir) => {
-		watcher.stop();
-		watcher.instance = Chokidar
-			.watch(dir, watcher.options)
-			.on('raw', (ev, path, details) => watcher.onChangeCallback(ev, path, details));
-	},
-	stop: () => {
-		if (watcher.instance) watcher.instance.close();
-		watcher.instance = null;
-	}
-};
-
-
-
-function FileWatcher (file) {
-	if (!(this instanceof FileWatcher)) return new FileWatcher(file);
-	this.watcher = Chokidar.watch(file, watcher.options);
-	this.watcher.on('raw', (event) => {
-		if (event === 'modified') this.triggerEvent('change');
-	});
-	this.eventListeners = { change: [] };
-	return this;
-}
-
-
-FileWatcher.prototype.on = function (event, cb) {
-	if (!this.eventListeners[event]) throw new Error(`Event doesnt exist: ${event}`);
-	this.eventListeners[event].push(cb);
-	return this;
-};
-
-FileWatcher.prototype.triggerEvent = function (event, ...params) {
-	if (this.eventListeners[event]) {
-		this.eventListeners[event].forEach(cb => { cb.apply(cb, params); });
-	}
-	return this;
-};
-
-
-FileWatcher.prototype.stop = function () {
-	this.watcher.close();
-};
-
-
-
-
-
-
 
 
 function findFileIcon (ext = '') {
@@ -143,7 +81,6 @@ function addFolderUp (parentPath, fileList) {
 
 
 function readDir (path, options) {
-	watcher.start(path);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
@@ -162,11 +99,11 @@ function rename (item, newName) {
 
 
 function mkdir (path, name) {
-	return FS.mkdir(Path.join(path, name)).catch(e => console.log(e));
+	return FS.mkdir(Path.join(path, name)).catch(e => console.error(e));
 }
 
 function mkfile (path, name) {
-	return FS.ensureFile(Path.join(path, name)).catch(e => console.log(e));
+	return FS.ensureFile(Path.join(path, name)).catch(e => console.error(e));
 }
 
 
@@ -214,10 +151,6 @@ function move (items, path) {
 }
 
 
-function onChange (cb) {
-	if (typeof cb === 'function') watcher.onChangeCallback = cb;
-}
-
 
 module.exports = {
 	readDir,
@@ -227,6 +160,4 @@ module.exports = {
 	rm,
 	copy,
 	move,
-	onChange,
-	FileWatcher,
 };

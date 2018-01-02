@@ -212,6 +212,7 @@ FileList.prototype.load = function (highlightDir) {
 		highlightDir = this.getHighlightedItem().name;
 		if (!highlightDir) highlightDir = this.getItemByIdx(this.state.highlightedIndex).name;
 	}
+	this.list.innerHTML = '';
 	return this.dataSrc(this.state.currentDir).then(data => this.setData(data, highlightDir));
 };
 
