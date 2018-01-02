@@ -1,5 +1,5 @@
 const { $, EVENT, helper } = require('../core');
-const { Files } = require('../services');
+const { FileWatcher } = require('../services');
 const FS = require('fs-extra');
 const file = `${helper.getUserDataFolder()}/filer-settings.js`;
 const JSON5 = require('json5');
@@ -43,9 +43,7 @@ function get () {
 function init () {
 	if (!FS.pathExistsSync(file)) return writeDefaultSettings();
 
-	const watcher = Files.FileWatcher(file);
-	watcher.on('change', onSettingsUpdated);
-
+	FileWatcher(file).on('change', onSettingsUpdated);
 
 	$.on(EVENT.settings.show, () => helper.openFile(file));
 	$.on(EVENT.settings.purge, purgeSettings);

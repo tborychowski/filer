@@ -10,7 +10,7 @@ function createWindow () {
 	win = new BrowserWindow({
 		title,
 		icon: __dirname + '/assets/icon.png',
-		show: false,
+		show: true,
 		x: mainWindowState.x,
 		y: mainWindowState.y,
 		width: mainWindowState.width,
@@ -22,8 +22,13 @@ function createWindow () {
 			blinkFeatures: 'CSSBackdropFilter'
 		}
 	});
+
+	console.log('create window');
 	win.on('closed', () => win = null);
-	win.webContents.on('crashed', () => { win.destroy(); createWindow(); });
+	win.webContents.on('crashed', () => {
+		win.destroy();
+		createWindow();
+	});
 
 	mainWindowState.manage(win);
 
@@ -34,7 +39,6 @@ function createWindow () {
 	win.once('ready-to-show', () => win.show());
 	win.on('blur', () => send('window', 'blur'));
 	win.on('focus', () => send('window', 'focus'));
-
 }
 
 app.on('window-all-closed', app.quit);

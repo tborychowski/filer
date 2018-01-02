@@ -1,10 +1,10 @@
 const { $, EVENT, helper, dialog, config } = require('../core');
-const { Files, Git } = require('../services');
+const { Files, Git, FileWatcher } = require('../services');
 const Clipboard = require('../clipboard');
 const FileList = require('./filelist');
 const Settings = require('../settings');
 
-let flist;
+let flist, watcher;
 
 
 function copyPath () {
@@ -129,6 +129,7 @@ function init () {
 		.on('change', () => $.trigger(EVENT.filelist.changed, flist))
 		.on('dirChange', path => {
 			config.set('currentDir', path);
+			watcher.update(path);
 			$.trigger(EVENT.dir.changed, path);
 		})
 		.on('newItem', newItem)
@@ -136,7 +137,9 @@ function init () {
 
 	setTimeout(() => flist.start(), 300);
 
-	Files.onChange(reloadAfterDelete);
+	watcher = FileWatcher(startDir)
+		.on('change', reloadAfterDelete);
+
 
 	// $.on(EVENT.filelist.undo, undo);
 	// $.on(EVENT.filelist.redo, redo);
