@@ -120,6 +120,7 @@ function init () {
 	const settings = Settings.get();
 	let startDir = config.get('currentDir') || helper.homeDir;
 	if (settings.startDir && settings.startDir !== 'auto') startDir = settings.startDir;
+	startDir = Files.getExistingDir(startDir);
 
 	flist = FileList({
 		dataSrc: dir => Files.readDir(dir, { showHidden: config.get('showHidden') }),

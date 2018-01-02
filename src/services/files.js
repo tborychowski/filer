@@ -14,10 +14,6 @@ const dotRegEx = /^\./;
 let CASE_SENSITIVE = false;	// for sorting
 
 
-// /some/long/path => /some/long
-const dropLastSegment = path => path.split(sep).slice(0, -1).join(sep);
-
-
 function findFileIcon (ext = '') {
 	ext = ext.toLowerCase().substr(1);
 	if (FileExtMap[ext]) return `file-${FileExtMap[ext]}-o`;
@@ -68,7 +64,7 @@ function addFolderUp (parentPath, fileList) {
 			name: '..',
 			basename: '..',
 			ext: '',
-			path: dropLastSegment(parentPath),
+			path: Path.dirname(parentPath),
 			parentPath,
 			isHidden: false,
 			isDir: true,
@@ -81,6 +77,7 @@ function addFolderUp (parentPath, fileList) {
 
 
 function readDir (path, options) {
+	path = getExistingDir(path);
 	return FS.readdir(path)
 		.then(files => sortFiles(path, files, options))
 		.then(files => getFilesDetails(path, files))
@@ -151,6 +148,18 @@ function move (items, path) {
 }
 
 
+/**
+ * Returns an existing folder from the path.
+ * - if the path exists - return it
+ * - if it doesn't - go up and check again.
+ * @param  {string}    path to check
+ * @return {string}    path that exists
+ */
+function getExistingDir (path) {
+	if (FS.existsSync(path)) return path;
+	return getExistingDir(Path.dirname(path));
+}
+
 
 module.exports = {
 	readDir,
@@ -160,4 +169,5 @@ module.exports = {
 	rm,
 	copy,
 	move,
+	getExistingDir,
 };
