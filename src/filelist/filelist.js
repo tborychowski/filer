@@ -122,8 +122,7 @@ FileList.prototype.gotoDir = function (dir = this.config.dir) {
 	if (dir === this.state.currentDir) return;
 	this.state.currentDir = dir;
 	this.triggerEvent('dirChange', this.state.currentDir);
-	this.load();
-	return this;
+	return this.load();
 };
 
 
@@ -139,7 +138,10 @@ FileList.prototype.openItem = function () {
 	const item = this.getHighlightedItem();
 	if (item.isDir) {
 		if (item.name === '..') this.goUp();
-		else this.gotoDir(item.path);
+		else {
+			this.state.highlightedIndex = 0;
+			this.gotoDir(item.path);
+		}
 	}
 	else this.triggerEvent('openFile', item.path);
 };
