@@ -153,6 +153,7 @@ CommandPalette.prototype.initEvents = function () {
 
 
 CommandPalette.prototype.onDocumentKeyDown = function (e) {
+	console.log(e);
 	if (e.key === 'p' && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
 		e.preventDefault();
 		if (this.state.open) this.close();

@@ -56,7 +56,7 @@ function getButtonHtml (btn) {
 function initCustomButtons () {
 	const settings = Settings.get();
 	if (settings) customButtons = settings.customButtons;
-	if (!customButtons.length) return;
+	if (!customButtons || customButtons.length) return;
 	const html = customButtons.map(getButtonHtml).join('');
 	customButtonsEl.html(html);
 }
