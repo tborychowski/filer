@@ -16,7 +16,7 @@
     "release": "gulp build && build --mac --publish always"
   },
   "author": "Tom",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "build": {
     "appId": "com.electron.filer",
     "mac": {

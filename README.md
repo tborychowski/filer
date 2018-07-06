@@ -23,8 +23,3 @@ cd filer
 yarn
 yarn start
 ```
-
-
-# License
-*MIT*
-
